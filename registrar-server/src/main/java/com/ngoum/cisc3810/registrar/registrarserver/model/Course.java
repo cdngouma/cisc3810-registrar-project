@@ -1,5 +1,7 @@
 package com.ngoum.cisc3810.registrar.registrarserver.model;
 
+import java.util.List;
+
 public class Course {
     private int courseNo;
     private String courseSubject;
@@ -7,6 +9,23 @@ public class Course {
     private String courseName;
     private double units;
     private String courseDesc;
+
+    private List<Course> prerequisits;
+    private List<Course> conflictingCourses;
+
+    public Course(){ }
+
+    public Course(int courseNo, String courseSubject, int courseLevel, String courseName, double units,
+                  String courseDesc, List<Course> prerequisits, List<Course> conflictingCourses) {
+        this.courseNo = courseNo;
+        this.courseSubject = courseSubject;
+        this.courseLevel = courseLevel;
+        this.courseName = courseName;
+        this.units = units;
+        this.courseDesc = courseDesc;
+        this.prerequisits = prerequisits;
+        this.conflictingCourses = conflictingCourses;
+    }
 
     public Course(int courseNo, String courseSubject, int courseLevel, String courseName, double units) {
         this.courseNo = courseNo;
@@ -60,9 +79,19 @@ public class Course {
         this.courseDesc = courseDesc;
     }
 
-    /*@Override
-    public String toString(){
-        return String.format("[courseNo: %d, courseSubject: %s, courseLevel %d, courseName %s, units %f, courseDesc %s",
-                this.courseNo, this.courseSubject, this.courseLevel, this.courseName, this.units, this.courseDesc);
-    }*/
+    public List<Course> getPrerequisits() {
+        return prerequisits;
+    }
+
+    public void setPrerequisits(List<Course> prerequisits) {
+        this.prerequisits = prerequisits;
+    }
+
+    public List<Course> getConflictingCourses() {
+        return conflictingCourses;
+    }
+
+    public void setConflictingCourses(List<Course> conflictingCourses) {
+        this.conflictingCourses = conflictingCourses;
+    }
 }

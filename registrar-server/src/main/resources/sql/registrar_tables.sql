@@ -1,9 +1,9 @@
 /* Tables "owned" to the registrar office */
 /* departments */
-create table `AcadDept`(
-	dept_no int(3) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    dept_name varchar(100) UNIQUE NOT NULL,
-    dept_abv varchar(4) UNIQUE NOT NULL
+create table `CourseSubjects`(
+	subject_no int(3) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    subject_name varchar(100) UNIQUE NOT NULL,
+    subject_abv varchar(4) UNIQUE NOT NULL
 );
 
 /* semesters */
@@ -19,15 +19,15 @@ ALTER TABLE `EnrollmentPeriods` ADD CONSTRAINT `unq_period` UNIQUE(start_date, e
 /* courses */
 create table `Courses`(
 	course_no int(3) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    dept_no int(3) UNSIGNED NOT NULL,
+    subject_no int(3) UNSIGNED NOT NULL,
     course_name varchar(80),
     course_level int(4) UNSIGNED NOT NULL,
     units double(3,2) UNSIGNED NOT NULL,
     course_desc varchar(600)
 );
 
-ALTER TABLE `Courses` ADD FOREIGN KEY(dept_no) REFERENCES `AcadDept`(dept_no) ON DELETE CASCADE;
-ALTER TABLE `Courses` ADD CONSTRAINT `unq_course` UNIQUE(dept_no, course_level);
+ALTER TABLE `Courses` ADD FOREIGN KEY(subject_no) REFERENCES `AcadDept`(subject_no) ON DELETE CASCADE;
+ALTER TABLE `Courses` ADD CONSTRAINT `unq_course` UNIQUE(subject_no, course_level);
 
 /* prerequisits */
 create table `Prerequisits`(

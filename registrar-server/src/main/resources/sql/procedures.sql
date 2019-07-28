@@ -1,48 +1,84 @@
 DELIMITER $$
-CREATE PROCEDURE `get_prereq_by_course_abv`(IN course_subject varchar(4), IN course_level int)
+CREATE PROCEDURE `find_course_by_subject`(IN courseSubject varchar(4))
 BEGIN
-	SELECT `Prerequisits`.course_no, sec_course_no, dept_abv, course_level, course_name, units, prereq_group
-	FROM `Prerequisits`
-	JOIN `Courses` ON `Prerequisits`.sec_course_no=`Courses`.course_no
-	JOIN `AcadDept` ON `Courses`.dept_no=`AcadDept`.dept_no
-	WHERE `Prerequisits`.course_no = (SELECT course_no FROM Courses WHERE dept_abv = course_subject AND Courses.course_level = course_level)
-	ORDER BY `Prerequisits`.sec_course_no;
-END; $$
-DELIMITER ;
-
-DELIMITER $$
-CREATE PROCEDURE `get_conflicting_courses_by_course_abv`(IN course_subject varchar(4), IN course_level int)
-BEGIN
-	SELECT sec_course_no, dept_abv, course_level, course_name, units
-	FROM `conflictingcourses`
-	JOIN `Courses` ON `conflictingcourses`.sec_course_no=`Courses`.course_no
-	JOIN `AcadDept` ON `Courses`.dept_no=`AcadDept`.dept_no
-	WHERE `conflictingcourses`.course_no = (SELECT course_no FROM Courses WHERE dept_abv = course_subject AND Courses.course_level = course_level)
-	ORDER BY `conflictingcourses`.course_no;
-END; $$
-DELIMITER ;
-
-DELIMITER $$
-CREATE PROCEDURE `get_courses_by_subject` (IN course_subject varchar(4))
-BEGIN
-	IF course_subject IS NOT NULL THEN
-		SELECT course_no, dept_abv, course_level, course_name, units
-		FROM `Courses`
-		JOIN `AcadDept` ON `Courses`.dept_no=`AcadDept`.dept_no
-        WHERE `Courses`.dept_no = (SELECT DISTINCT Courses.dept_no
-								FROM Courses JOIN AcadDept ON Courses.dept_no=AcadDept.dept_no
-								WHERE dept_abv = course_subject)
-		ORDER BY dept_abv, course_level;
+	IF courseSubject IS NULL THEN
+		SELECT course_no, subject_abv, course_level, course_name, units, course_desc
+        FROM Courses
+        JOIN CourseSubjects ON Courses.subject_no=CourseSubjects.subject_no
+        ORDER BY subject_abv, course_level;
 	ELSE
-		SELECT course_no, dept_abv, course_level, course_name, units
-		FROM `Courses`
-		JOIN `AcadDept` ON `Courses`.dept_no=`AcadDept`.dept_no
-		ORDER BY dept_abv, course_level;
+		SELECT course_no, subject_abv, course_level, course_name, units, course_desc
+		FROM Courses
+		JOIN CourseSubjects ON Courses.subject_no=CourseSubjects.subject_no
+		WHERE Courses.subject_no = (SELECT DISTINCT Courses.subject_no
+			FROM Courses JOIN CourseSubjects ON Courses.subject_no=CourseSubjects.subject_no WHERE subject_abv=courseSubject)
+		ORDER BY course_level;
 	END IF;
 END; $$
-DELIMITER;
+DELIMITER ;
 
 DELIMITER $$
+CREATE PROCEDURE `find_course_by_id` (IN id int)
+BEGIN
+	SELECT course_no, subject_abv, course_level, course_name, units, course_desc 
+	FROM Courses
+	JOIN CourseSubjects ON Courses.subject_no = CourseSubjects.subject_no
+	WHERE Courses.course_no = id;
+END; $$
+DELIMITER ;
+
+CALL find_course_by_id(016);
+CALL find_course_by_subject('CISC');
+
+DELIMITER $$
+CREATE PROCEDURE `find_class` (IN courseSubject varchar(4), IN courseLevel int, IN lvl_range varchar(8))
+
+BEGIN
+	
+	IF ref IS NULL THEN
+		SELECT course_no AS courseno, subject_abv, course_level, course_name, units
+        FROM Courses
+        JOIN CourseSubjects ON Courses.subject_no=CourseSubjects.subject_no;
+	
+	ELSEIF REGEXP_LIKE(ref, '^([0-9]+)') > 0 THEN
+		SELECT course_no AS courseno, subject_abv, course_level, course_name, units
+        FROM Courses
+        JOIN CourseSubjects ON Courses.subject_no=CourseSubjects.subject_no
+        WHERE Courses.course_no = ref;
+	
+	ELSE
+		SELECT course_no AS courseno, subject_abv, course_level, course_name, units
+		FROM Courses
+		JOIN CourseSubjects ON Courses.subject_no=CourseSubjects.subject_no
+		WHERE Courses.subject_no = (SELECT DISTINCT Courses.subject_no
+			FROM Courses JOIN CourseSubjects ON Courses.subject_no=CourseSubjects.subject_no WHERE subject_abv = ref);
+	END IF;
+END; $$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE `find_prerequisit`(IN courseno int)
+BEGIN
+	SELECT `Prerequisits`.sec_course_no AS courseno, subject_abv, course_level, course_name
+	FROM `Prerequisits`
+	JOIN `Courses` ON `Prerequisits`.sec_course_no=`Courses`.course_no
+	JOIN `CourseSubjects` ON `Courses`.subject_no=`CourseSubjects`.subject_no
+	WHERE `Prerequisits`.course_no = courseno;
+END; $$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE `find_conf_courses`(IN courseno int)
+BEGIN
+	SELECT sec_course_no AS courseno, subject_abv, course_level, course_name
+	FROM `ConflictingCourses`
+	JOIN `Courses` ON `ConflictingCourses`.sec_course_no=`Courses`.course_no
+	JOIN `CourseSubjects` ON `Courses`.subject_no=`CourseSubjects`.subject_no
+	WHERE `ConflictingCourses`.course_no = courseno;
+END; $$
+DELIMITER ;
+
+/*DELIMITER $$
 CREATE PROCEDURE `addStudent`(
 	IN occupation varchar(10),
     IN first_name varchar(100),
@@ -96,4 +132,4 @@ CALL addInstructor('test1234', 'INSTRUCTOR', 'Charles', 'Brown', 'male', '1983-0
 
 SHOW PROCEDURE STATUS WHERE db = 'cisc3810@registrar';
 
-select CONCAT('Charles', '.', 'Brown', 10000%100, '@ENS.STEM.EDU');
+select CONCAT('Charles', '.', 'Brown', 10000%100, '@ENS.STEM.EDU');*/

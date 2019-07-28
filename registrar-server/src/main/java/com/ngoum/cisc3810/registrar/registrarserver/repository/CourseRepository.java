@@ -6,28 +6,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.sql.SQLException;
 import java.util.List;
 
 @Repository
 public class CourseRepository {
     @Autowired
     private JdbcTemplate jdbc;
-    //private final Logger LOG = LoggerFactory
 
-    public Course findById(int courseNo){
-        String query = "SELECT course_no, dept_abv, course_level, course_name, units\n" +
-                "FROM `Courses`\n" +
-                "JOIN `AcadDept` ON `Courses`.dept_no=`AcadDept`.dept_no\n" +
-                "WHERE course_no=?";
-
-        return jdbc.queryForObject(query, new CourseRowMapper(), courseNo);
+    public Course findCourseById(int courseNo){
+        Course course = jdbc.queryForObject("CALL find_course_by_id(?)", new CourseRowMapper(), courseNo);
+        return course;
     }
 
-    public List<Course> findAllCourses(String courseSubject){
-        if(courseSubject != null) courseSubject = "\'" + courseSubject + "\'";
+    public List<Course> findAllCoursesBySubject(String courseSubject){
+        return jdbc.query("CALL find_course_by_subject(?)", new CourseRowMapper(), courseSubject);
+    }
 
-        String query = "CALL get_courses_by_subject(" + courseSubject + ")";
-
-        return jdbc.query(query, new CourseRowMapper());
+    public boolean deleteCourseById(int courseNo){
+        jdbc.update("DELETE FROM Courses WHERE course_no = ?", courseNo);
+        return true;
     }
 }

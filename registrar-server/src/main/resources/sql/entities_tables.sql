@@ -17,7 +17,7 @@ ALTER TABLE `User_Devices` ADD FOREIGN KEY(userno) REFERENCES `Users`(userno) ON
 
 create table `Instructors`(
 	id int(7) UNSIGNED UNIQUE NOT NULL,
-    dept_no int(3) UNSIGNED NOT NULL,
+    subject_no int(3) UNSIGNED NOT NULL,
     email varchar(250) UNIQUE NOT NULL,
     first_name varchar(80) NOT NULL,
     last_name varchar(80) NOT NULL,

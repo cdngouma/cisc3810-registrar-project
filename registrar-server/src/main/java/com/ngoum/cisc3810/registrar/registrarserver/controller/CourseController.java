@@ -14,13 +14,12 @@ public class CourseController {
     private CourseRepository repository;
 
     @GetMapping
-    public List<Course> getAllCourses(@RequestParam(value="subject", required = false) String courseSubject){
-        return repository.findAllCourses(courseSubject);
+    public List<Course> getAllCoursesBySubject(@RequestParam(value="subject", required = false) String courseSubject){
+        return repository.findAllCoursesBySubject(courseSubject);
     }
 
     @GetMapping(path="/{id}")
     public Course getCourseById(@PathVariable(value="id") int courseNo){
-        return repository.findById(courseNo);
+        return repository.findCourseById(courseNo);
     }
-
 }
