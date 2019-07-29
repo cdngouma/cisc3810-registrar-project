@@ -3,7 +3,6 @@ package com.ngoum.cisc3810.registrar.registrarserver.controller;
 import com.ngoum.cisc3810.registrar.registrarserver.model.CourseSubject;
 import com.ngoum.cisc3810.registrar.registrarserver.repository.SubjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 

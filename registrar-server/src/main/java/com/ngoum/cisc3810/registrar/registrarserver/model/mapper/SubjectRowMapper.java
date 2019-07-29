@@ -1,5 +1,6 @@
-package com.ngoum.cisc3810.registrar.registrarserver.model;
+package com.ngoum.cisc3810.registrar.registrarserver.model.mapper;
 
+import com.ngoum.cisc3810.registrar.registrarserver.model.CourseSubject;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;

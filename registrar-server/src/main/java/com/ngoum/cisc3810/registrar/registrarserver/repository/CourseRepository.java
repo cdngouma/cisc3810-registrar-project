@@ -1,12 +1,11 @@
 package com.ngoum.cisc3810.registrar.registrarserver.repository;
 
 import com.ngoum.cisc3810.registrar.registrarserver.model.Course;
-import com.ngoum.cisc3810.registrar.registrarserver.model.CourseRowMapper;
+import com.ngoum.cisc3810.registrar.registrarserver.model.mapper.CourseRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.sql.SQLException;
 import java.util.List;
 
 @Repository
@@ -15,7 +14,11 @@ public class CourseRepository {
     private JdbcTemplate jdbc;
 
     public Course findCourseById(int courseNo){
-        Course course = jdbc.queryForObject("CALL find_course_by_id(?)", new CourseRowMapper(), courseNo);
+        Course course = (Course)jdbc.queryForObject("CALL find_course_by_id(?)", new CourseRowMapper(), courseNo);
+        List<Course> prerequisits = jdbc.query("CALL find_prerequisits(?)", new CourseRowMapper(), courseNo);
+        if(course != null){
+            course.setPrerequisits(prerequisits);
+        }
         return course;
     }
 

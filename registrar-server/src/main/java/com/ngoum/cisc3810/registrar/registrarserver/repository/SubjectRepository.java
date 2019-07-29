@@ -1,12 +1,9 @@
 package com.ngoum.cisc3810.registrar.registrarserver.repository;
 
-import com.ngoum.cisc3810.registrar.registrarserver.model.Course;
-import com.ngoum.cisc3810.registrar.registrarserver.model.CourseRowMapper;
 import com.ngoum.cisc3810.registrar.registrarserver.model.CourseSubject;
-import com.ngoum.cisc3810.registrar.registrarserver.model.SubjectRowMapper;
+import com.ngoum.cisc3810.registrar.registrarserver.model.mapper.SubjectRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;

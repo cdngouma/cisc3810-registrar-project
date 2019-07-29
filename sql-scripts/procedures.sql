@@ -1,5 +1,5 @@
 DELIMITER $$
-CREATE PROCEDURE `find_course_by_subject`(IN courseSubject varchar(4))
+CREATE PROCEDURE `find_course_by_subject` (IN courseSubject varchar(4))
 BEGIN
 	IF courseSubject IS NULL THEN
 		SELECT course_no, subject_abv, course_level, course_name, units, course_desc
@@ -31,35 +31,9 @@ CALL find_course_by_id(016);
 CALL find_course_by_subject('CISC');
 
 DELIMITER $$
-CREATE PROCEDURE `find_class` (IN courseSubject varchar(4), IN courseLevel int, IN lvl_range varchar(8))
-
+CREATE PROCEDURE `find_prerequisits`(IN courseno int)
 BEGIN
-	
-	IF ref IS NULL THEN
-		SELECT course_no AS courseno, subject_abv, course_level, course_name, units
-        FROM Courses
-        JOIN CourseSubjects ON Courses.subject_no=CourseSubjects.subject_no;
-	
-	ELSEIF REGEXP_LIKE(ref, '^([0-9]+)') > 0 THEN
-		SELECT course_no AS courseno, subject_abv, course_level, course_name, units
-        FROM Courses
-        JOIN CourseSubjects ON Courses.subject_no=CourseSubjects.subject_no
-        WHERE Courses.course_no = ref;
-	
-	ELSE
-		SELECT course_no AS courseno, subject_abv, course_level, course_name, units
-		FROM Courses
-		JOIN CourseSubjects ON Courses.subject_no=CourseSubjects.subject_no
-		WHERE Courses.subject_no = (SELECT DISTINCT Courses.subject_no
-			FROM Courses JOIN CourseSubjects ON Courses.subject_no=CourseSubjects.subject_no WHERE subject_abv = ref);
-	END IF;
-END; $$
-DELIMITER ;
-
-DELIMITER $$
-CREATE PROCEDURE `find_prerequisit`(IN courseno int)
-BEGIN
-	SELECT `Prerequisits`.sec_course_no AS courseno, subject_abv, course_level, course_name
+	SELECT `Prerequisits`.sec_course_no AS course_no, subject_abv, course_level, course_name, units
 	FROM `Prerequisits`
 	JOIN `Courses` ON `Prerequisits`.sec_course_no=`Courses`.course_no
 	JOIN `CourseSubjects` ON `Courses`.subject_no=`CourseSubjects`.subject_no
@@ -67,14 +41,23 @@ BEGIN
 END; $$
 DELIMITER ;
 
+CALL find_prerequisits(016);
+
 DELIMITER $$
-CREATE PROCEDURE `find_conf_courses`(IN courseno int)
+CREATE PROCEDURE `get_current_enrollment_periods`()
 BEGIN
-	SELECT sec_course_no AS courseno, subject_abv, course_level, course_name
-	FROM `ConflictingCourses`
-	JOIN `Courses` ON `ConflictingCourses`.sec_course_no=`Courses`.course_no
-	JOIN `CourseSubjects` ON `Courses`.subject_no=`CourseSubjects`.subject_no
-	WHERE `ConflictingCourses`.course_no = courseno;
+	SELECT period_no, semester, start_date, end_date, YEAR(DATE(end_date)) AS sem_year
+    FROM EnrollmentPeriods
+    WHERE start_date > CURRENT_DATE();
+END; $$
+DELIMITER ;
+
+
+
+DELIMITER $$
+CREATE PROCEDURE `find_class` (IN courseSubject varchar(4), IN courseLevel int, IN lvl_range varchar(8))
+BEGIN
+	
 END; $$
 DELIMITER ;
 
