@@ -37,3 +37,16 @@ BEGIN
 	END IF;
 END; $$
 DELIMITER ;
+
+/*
+DELIMITER $$
+CREATE TRIGGER `ins_class` BEFORE INSERT ON `Classes`
+FOR EACH ROW
+BEGIN
+	IF (SELECT 1 FROM Classes C 
+		WHERE NEW.start_time >= C.start_time AND NEW.start_time <= C.end_time 
+        OR NEW.end_time >= C.start_time AND NEW.end_time <= C.end_time
+        AND 
+END;
+DELIMITER ;
+*/

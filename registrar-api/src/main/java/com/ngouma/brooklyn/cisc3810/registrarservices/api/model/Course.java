@@ -1,8 +1,10 @@
 package com.ngouma.brooklyn.cisc3810.registrarservices.api.model;
 
-import javax.validation.constraints.Max;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import javax.validation.constraints.Positive;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Course {
     private Long id;
     private Long subjectId;
@@ -17,6 +19,11 @@ public class Course {
     private int numPrerequisites;
 
     public Course(){}
+
+    public Course(Long id, String courseNameLong){
+        this.id = id;
+        this.name = courseNameLong;
+    }
 
     public Course(Long id, Long subjectId, int level, String name, double units, String desc) {
         this.id = id;

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import java.sql.Time;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Class {
+public class ClassEntity {
     private Long id;
     private Course course;
     private String courseName;
@@ -20,7 +20,7 @@ public class Class {
     private int numEnrolledStudents;
     private boolean opened;
 
-    public Class(Long id, Course course, String semester, Time startTime, Time endTime, String mode, boolean opened) {
+    public ClassEntity(Long id, Course course, String semester, Time startTime, Time endTime, String mode, boolean opened) {
         this.id = id;
         this.course = course;
         this.semester = semester;
@@ -30,9 +30,8 @@ public class Class {
         this.opened = opened;
     }
 
-    public Class(Long id, Course course, String courseName, String instructor, String semester,
-                 Time startTime, Time endTime, String mode, String room,
-                 int capacity, int numEnrolledStudents, boolean opened) {
+    public ClassEntity(Long id, Course course, String courseName, String instructor, Time startTime, Time endTime,
+                       String mode, String room, int capacity, int numEnrolledStudents, boolean opened) {
         this.id = id;
         this.course = course;
         this.courseName = courseName;

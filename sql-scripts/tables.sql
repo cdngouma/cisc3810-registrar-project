@@ -65,19 +65,6 @@ create table `Classes`(
     opened boolean NOT NULL DEFAULT TRUE
 );
 
-/* SU19 */
-insert into Classes values(NULL,2,'Kelly Fox',6,'8:00','09:10','IN-PERSON','BH 409',22,22,FALSE);
-insert into Classes values(NULL,2,'Lydia Simpson',6,'11:50','13:00','IN-PERSON','BH 345',22,13,TRUE);
-/* FA19 */
-insert into Classes values(NULL,8,'Ronald Callahan',7,'18:30','20:35','IN-PERSON','IA 214',30,23,TRUE);
-insert into MeetingDays values(NULL,3,1); insert into MeetingDays values(NULL,3,3);
-insert into Classes values(NULL,14,'Dar Stein',7,'18:00','22:00','IN-PERSON','IA 214',40,37,TRUE);
-insert into MeetingDays values(NULL,4,2);
-insert into Classes values(NULL,14,'Jorah Dukes',7,'09:05','10:55','IN-PERSON','IN 414',40,39,TRUE);
-insert into MeetingDays values(NULL,5,0); insert into MeetingDays values(NULL,5,2);
-insert into Classes values(NULL,14,'Jorah Dukes',7,'09:05','10:55','IN-PERSON','IN 414',40,39,TRUE);
-insert into MeetingDays values(NULL,5,0); insert into MeetingDays values(NULL,5,2);
-
 ALTER TABLE `Classes` ADD FOREIGN KEY(course_no) REFERENCES `Courses`(course_no) ON DELETE CASCADE;
 ALTER TABLE `Classes` ADD FOREIGN KEY(sem_no) REFERENCES `Semesters`(sem_no) ON DELETE CASCADE;
 ALTER TABLE `Classes` ADD CONSTRAINT `ck_class_time` CHECK(start_time < end_time);
@@ -92,14 +79,3 @@ create table `MeetingDays`(
 );
 
 ALTER TABLE `MeetingDays` ADD CONSTRAINT `unq_meeting_day` UNIQUE(m_day, class_no);
-
-DELIMITER $$
-CREATE TRIGGER `ins_class` BEFORE INSERT ON `Classes`
-FOR EACH ROW
-BEGIN
-	IF (SELECT 1 FROM Classes C 
-		WHERE NEW.start_time >= C.start_time AND NEW.start_time <= C.end_time 
-        OR NEW.end_time >= C.start_time AND NEW.end_time <= C.end_time
-        AND 
-END;
-DELIMITER ;

@@ -1,8 +1,8 @@
 package com.ngouma.brooklyn.cisc3810.registrarservices.api.controller;
 
 import com.ngouma.brooklyn.cisc3810.registrarservices.api.model.Semester;
+import com.ngouma.brooklyn.cisc3810.registrarservices.api.repository.ClassRepo;
 import com.ngouma.brooklyn.cisc3810.registrarservices.api.repository.SemesterRepo;
-import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +16,9 @@ import java.util.List;
 public class SemesterController {
     @Autowired
     private SemesterRepo semesterRepo;
+
+    @Autowired
+    private ClassRepo classRepo;
 
     @GetMapping
     public List<Semester> getAllSemesters(@RequestParam(value = "current") boolean current){
