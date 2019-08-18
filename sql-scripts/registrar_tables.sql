@@ -29,16 +29,16 @@ create table `Courses`(
 ALTER TABLE `Courses` ADD FOREIGN KEY(subj_no) REFERENCES `Subjects`(subj_no) ON DELETE CASCADE;
 ALTER TABLE `Courses` ADD CONSTRAINT `unq_course` UNIQUE(subj_no, course_level);
 
-create table `Prerequisits`(
+create table `Prerequisites`(
 	prereq_no int(3) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     course_no int(5) UNSIGNED NOT NULL,
     sec_course_no int(5) UNSIGNED NOT NULL,
     prereq_group int(1) UNSIGNED
 );
 
-ALTER TABLE `Prerequisits` ADD FOREIGN KEY(course_no) REFERENCES `Courses`(course_no) ON DELETE CASCADE;
-ALTER TABLE `Prerequisits` ADD FOREIGN KEY(sec_course_no) REFERENCES `Courses`(course_no) ON DELETE CASCADE;
-ALTER TABLE `Prerequisits` ADD CONSTRAINT `unq_prereq` UNIQUE(course_no, sec_course_no);
+ALTER TABLE `Prerequisites` ADD FOREIGN KEY(course_no) REFERENCES `Courses`(course_no) ON DELETE CASCADE;
+ALTER TABLE `Prerequisites` ADD FOREIGN KEY(sec_course_no) REFERENCES `Courses`(course_no) ON DELETE CASCADE;
+ALTER TABLE `Prerequisites` ADD CONSTRAINT `unq_prereq` UNIQUE(course_no, sec_course_no);
 
 create table `Conflicting_Courses`(
 	conf_no int(3) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -77,23 +77,6 @@ insert into Classes values(NULL,14,'Jorah Dukes',7,'09:05','10:55','IN-PERSON','
 insert into MeetingDays values(NULL,5,0); insert into MeetingDays values(NULL,5,2);
 insert into Classes values(NULL,14,'Jorah Dukes',7,'09:05','10:55','IN-PERSON','IN 414',40,39,TRUE);
 insert into MeetingDays values(NULL,5,0); insert into MeetingDays values(NULL,5,2);
-
-select 	k.class_no, 
-		concat(s.subj_abv,' ',c.course_level) as course_shr,
-		c.course_name,
-        k.instr_name,
-        z.start_date,
-        z.end_date,
-        k.room,
-        k.capacity,
-        k.num_enrolled,
-        k.`mode`,
-        k.opened
-from classes k
-join courses c on c.course_no=k.course_no
-join subjects s on s.subj_no=c.subj_no
-join semesters z on z.sem_no=k.sem_no;
-
 
 ALTER TABLE `Classes` ADD FOREIGN KEY(course_no) REFERENCES `Courses`(course_no) ON DELETE CASCADE;
 ALTER TABLE `Classes` ADD FOREIGN KEY(sem_no) REFERENCES `Semesters`(sem_no) ON DELETE CASCADE;

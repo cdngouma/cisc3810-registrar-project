@@ -32,7 +32,7 @@ public class SubjectController {
 
     @GetMapping(path = "/{id}/courses")
     public List<Course> getAllCourses(@PathVariable(value = "id") Long subjId) {
-        return courseRepo.findAll(subjId);
+        return courseRepo.findAllCourses(subjId);
     }
 
     @PostMapping
@@ -41,22 +41,21 @@ public class SubjectController {
     }
 
     @PutMapping(path = "/{id}")
-    public Subject updateSubject(@PathVariable(value = "id") Long subjId, @Valid @RequestBody Subject subjectDetails) {
-        Subject subject = subjectRepo.findById(subjId);
-        subject.setName(subjectDetails.getName());
-        subject.setNameShort(subjectDetails.getNameShort());
-        return subject;
+    public Subject updateSubject(@PathVariable(value = "id") Long subjId, @Valid @RequestBody Subject details) {
+        return subjectRepo.update(subjId, details);
     }
 
     @DeleteMapping
     public ResponseEntity<?> deleteAllSubject() {
-        subjectRepo.deleteAll();
-        return new ResponseEntity<>(HttpStatus.OK);
+        if(subjectRepo.deleteAll())
+            return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping(path = "/{id}")
     public ResponseEntity<?> deleteSubject(@PathVariable(value = "id") Long subjId) {
-        subjectRepo.deleteById(subjId);
-        return new ResponseEntity<>(HttpStatus.OK);
+        if(subjectRepo.deleteById(subjId))
+            return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

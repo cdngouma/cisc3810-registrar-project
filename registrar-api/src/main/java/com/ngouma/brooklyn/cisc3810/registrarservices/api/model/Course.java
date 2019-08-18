@@ -1,13 +1,15 @@
 package com.ngouma.brooklyn.cisc3810.registrarservices.api.model;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Positive;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Course {
     private Long id;
     private Long subjectId;
+    @Positive
     private int level;
     private String name;
+    @Positive
     private double units;
     private String desc;
 

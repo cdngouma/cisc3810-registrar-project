@@ -1,11 +1,15 @@
 package com.ngouma.brooklyn.cisc3810.registrarservices.api.model;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.util.Date;
 
 public class Semester {
     private Long id;
     private String semester;
+    @DateTimeFormat
     private Date startDate;
+    @DateTimeFormat
     private Date endDate;
 
     public Semester(Long id, String semester, Date startDate, Date endDate) {
