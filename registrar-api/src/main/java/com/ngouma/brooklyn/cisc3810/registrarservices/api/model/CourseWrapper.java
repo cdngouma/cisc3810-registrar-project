@@ -7,50 +7,50 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class CourseWrapper {
-    private Long id;
-    private Long courseNo;
+    private Integer id;
+    private Integer courseNo;
     private String courseName;
-    private int group;
+    private byte group;
 
     public CourseWrapper() { }
 
-    public CourseWrapper(Long courseNo, int group) {
+    public CourseWrapper(Integer courseNo, byte group) {
         this.courseNo = courseNo;
         this.group = group;
     }
 
-    public CourseWrapper(Long id, Long courseNo, int group) {
+    public CourseWrapper(Integer id, Integer courseNo, byte group) {
         this.id = id;
         this.courseNo = courseNo;
         this.group = group;
     }
 
-    public CourseWrapper(Long id, Long courseNo, String courseName, int group) {
-        this.id = id;
-        this.courseNo = courseNo;
-        this.courseName = courseName;
-        this.group = group;
-    }
-
-    public CourseWrapper(Long id, Long courseNo, String courseName) {
+    public CourseWrapper(Integer id, Integer courseNo, String courseName, byte group) {
         this.id = id;
         this.courseNo = courseNo;
         this.courseName = courseName;
+        this.group = group;
     }
 
-    public Long getId() {
+    public CourseWrapper(Integer id, Integer courseNo, String courseName) {
+        this.id = id;
+        this.courseNo = courseNo;
+        this.courseName = courseName;
+    }
+
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public Long getCourseNo() {
+    public Integer getCourseNo() {
         return courseNo;
     }
 
-    public void setCourseNo(Long courseNo) {
+    public void setCourseNo(Integer courseNo) {
         this.courseNo = courseNo;
     }
 
@@ -66,7 +66,7 @@ public class CourseWrapper {
         return group;
     }
 
-    public void setGroup(int group) {
+    public void setGroup(byte group) {
         this.group = group;
     }
 }

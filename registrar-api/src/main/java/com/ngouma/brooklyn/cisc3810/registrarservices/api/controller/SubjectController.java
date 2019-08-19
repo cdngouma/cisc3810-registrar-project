@@ -13,47 +13,35 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping("/subjects")
+@RequestMapping("/api/v1")
 public class SubjectController {
     @Autowired
     private SubjectRepo subjectRepo;
     @Autowired
     private CourseRepo courseRepo;
 
-    @GetMapping
+    @GetMapping(path = "/subjects")
     public List<Subject> getAllSubjects() {
         return subjectRepo.findAll();
     }
 
-    @GetMapping(path = "/{id}")
-    public Subject getSubject(@PathVariable(value = "id") Long subjId) {
+    @GetMapping(path = "/subjects/{id}")
+    public Subject getSubject(@PathVariable(value = "id") Integer subjId) {
         return subjectRepo.findById(subjId);
     }
 
-    @GetMapping(path = "/{id}/courses")
-    public List<Course> getAllCourses(@PathVariable(value = "id") Long subjId) {
-        return courseRepo.findAllCourses(subjId);
-    }
-
-    @PostMapping
+    @PostMapping(path = "/subjects")
     public Subject createSubject(@Valid @RequestBody Subject subject) {
         return subjectRepo.save(subject);
     }
 
-    @PutMapping(path = "/{id}")
-    public Subject updateSubject(@PathVariable(value = "id") Long subjId, @Valid @RequestBody Subject details) {
+    @PutMapping(path = "/subjects/{id}")
+    public Subject updateSubject(@PathVariable(value = "id") Integer subjId, @Valid @RequestBody Subject details) {
         return subjectRepo.update(subjId, details);
     }
 
-    @DeleteMapping
-    public ResponseEntity<?> deleteAllSubject() {
-        if(subjectRepo.deleteAll())
-            return new ResponseEntity<>(HttpStatus.OK);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
-
-    @DeleteMapping(path = "/{id}")
-    public ResponseEntity<?> deleteSubject(@PathVariable(value = "id") Long subjId) {
+    @DeleteMapping(path = "/subjects/{id}")
+    public ResponseEntity<?> deleteSubject(@PathVariable(value = "id") Integer subjId) {
         if(subjectRepo.deleteById(subjId))
             return new ResponseEntity<>(HttpStatus.OK);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

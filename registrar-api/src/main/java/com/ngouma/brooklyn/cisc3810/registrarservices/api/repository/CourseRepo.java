@@ -27,11 +27,11 @@ public class CourseRepo {
         /* get last added row */
         return jdbc.queryForObject("SELECT * FROM Courses WHERE course_no=(SELECT MAX(course_no) FROM Courses)", (rs, numRow) ->
                 new Course(
-                        rs.getLong("course_no"),
-                        rs.getLong("subj_no"),
-                        rs.getInt("course_level"),
+                        rs.getInt("course_no"),
+                        rs.getInt("subj_no"),
+                        rs.getShort("course_level"),
                         rs.getString("course_name"),
-                        rs.getDouble("units"),
+                        rs.getFloat("units"),
                         rs.getString("course_desc")
                 )
         );
@@ -42,7 +42,7 @@ public class CourseRepo {
      * @param c (course)
      * @return the updated course
      */
-    public Course updateCourse(Long courseId, Course c) {
+    public Course updateCourse(Integer courseId, Course c) {
         try {
             /* update course */
             String UPDATE_COURSE = "UPDATE Courses SET subj_no=COALESCE(?,subj_no), course_level=COALESCE(?,course_level)," +
@@ -57,76 +57,46 @@ public class CourseRepo {
 
     /**
      * @param subjId
-     * @return a list of all course under to the given subject
+     * @return if subject Id is provided return a list of all course under to the given subject
+     * else return a list of all courses
      */
-    public List<Course> findAllCourses(Long subjId) {
-        String SQL_GET_COURSES = "SELECT C.*, COUNT(P.prereq_no) AS 'numPrereq', COUNT(K.conf_no) AS 'numConf' " +
-                "FROM Courses C LEFT JOIN Prerequisites P ON C.course_no=P.course_no LEFT JOIN Conflicting_Courses K " +
-                "ON C.course_no=K.course_no WHERE C.subj_no=? GROUP BY C.course_no";
-        return jdbc.query(SQL_GET_COURSES, new Object[]{subjId}, (rs, numRow) ->
+    public List<Course> findAllCourses(Integer subjId) {
+        return jdbc.query("CALL FIND_ALL_COURSES(?)", new Object[]{subjId}, (rs, numRow) ->
                 new Course(
-                        rs.getLong("course_no"),
-                        rs.getLong("subj_no"),
-                        rs.getInt("course_level"),
-                        rs.getString("course_name"),
-                        rs.getDouble("units"),
-                        rs.getString("course_desc"),
-                        rs.getInt("numPrereq"),
-                        rs.getInt("numConf")
+                        rs.getInt("C.course_no"),
+                        rs.getInt("C.subj_no"),
+                        rs.getString("S.subj_abv"),
+                        rs.getShort("C.course_level"),
+                        rs.getString("C.course_name"),
+                        rs.getFloat("C.units"),
+                        rs.getString("C.course_desc"),
+                        rs.getByte("numPrereq"),
+                        rs.getByte("numConflicting")
                 )
         );
     }
 
-    /**
-     * @return all courses
-     */
-    public List<Course> findAllCourses() {
-        String SQL_GET_COURSES = "SELECT C.*, COUNT(P.prereq_no) AS 'numPrereq', COUNT(K.conf_no) AS 'numConf' " +
-                "FROM Courses C LEFT JOIN Prerequisites P ON C.course_no=P.course_no LEFT JOIN Conflicting_Courses K " +
-                "ON C.course_no=K.course_no GROUP BY C.course_no";
-        return jdbc.query(SQL_GET_COURSES, (rs, numRow) ->
-                new Course(
-                        rs.getLong("course_no"),
-                        rs.getLong("subj_no"),
-                        rs.getInt("course_level"),
-                        rs.getString("course_name"),
-                        rs.getDouble("units"),
-                        rs.getString("course_desc"),
-                        rs.getInt("numPrereq"),
-                        rs.getInt("numConf")
-                )
-        );
-    }
-
-    public Course findCourseById(Long courseId) {
-        String SQL_GET_COURSES = "SELECT C.*, COUNT(P.prereq_no) AS 'numPrereq', COUNT(K.conf_no) AS 'numConf'\n" +
-                "FROM Courses C LEFT JOIN Prerequisites P ON C.course_no=P.course_no LEFT JOIN Conflicting_Courses K\n" +
-                "ON C.course_no=K.course_no WHERE C.course_no=? GROUP BY C.course_no;";
+    public Course findCourseById(Integer courseId) {
         try {
-            Course course = jdbc.queryForObject(SQL_GET_COURSES, new Object[]{courseId}, (rs, numRow) ->
+            return jdbc.queryForObject("CALL FIND_COURSE_BY_ID(?)", new Object[]{courseId}, (rs, numRow) ->
                     new Course(
-                            rs.getLong("course_no"),
-                            rs.getLong("subj_no"),
-                            rs.getInt("course_level"),
-                            rs.getString("course_name"),
-                            rs.getDouble("units"),
-                            rs.getString("course_desc"),
-                            rs.getInt("numPrereq"),
-                            rs.getInt("numConf")
+                            rs.getInt("C.course_no"),
+                            rs.getInt("C.subj_no"),
+                            rs.getString("S.subj_abv"),
+                            rs.getShort("C.course_level"),
+                            rs.getString("C.course_name"),
+                            rs.getFloat("C.units"),
+                            rs.getString("C.course_desc"),
+                            rs.getByte("numPrereq"),
+                            rs.getByte("numConflicting")
                     )
             );
-
-            if (course != null) {
-                course.setNumPrerequisites(findNumPrerequisites(course.getId()));
-                course.setNumConflictingCourses(findNumConflictingCourses(course.getId()));
-            }
-            return course;
         } catch (EntityNotFoundException ex) {
             throw new EntityNotFoundException();
         }
     }
 
-    public boolean deleteCourseById(Long courseId) {
+    public boolean deleteCourseById(Integer courseId) {
         return jdbc.update("DELETE FROM Courses WHERE course_no=?", courseId) > 0;
     }
 
@@ -136,15 +106,13 @@ public class CourseRepo {
      * @param courseId
      * @return all the given course prerequisites
      */
-    public List<CourseWrapper> findAllPrereq(Long courseId) {
-        String SQL_GET_PREREQ = "SELECT P.prereq_no, P.sec_course_no AS courseId, CONCAT(S.subj_abv,' ',C.course_level) AS courseShort, P.prereq_group\n" +
-                "FROM Prerequisites P JOIN Courses C ON P.sec_course_no = C.course_no JOIN Subjects S ON C.subj_no = S.subj_no WHERE P.course_no=?";
-        return jdbc.query(SQL_GET_PREREQ, new Object[]{courseId}, (rs, numRow) ->
+    public List<CourseWrapper> findAllPrerequisites(Integer courseId) {
+        return jdbc.query("CALL FIND_ALL_COURSE_PREREQ(?)", new Object[]{courseId}, (rs, numRow) ->
                 new CourseWrapper(
-                        rs.getLong("P.prereq_no"),
-                        rs.getLong("courseId"),
-                        rs.getString("courseShort"),
-                        rs.getInt("P.prereq_group")
+                        rs.getInt("P.prereq_no"),
+                        rs.getInt("course_no"),
+                        rs.getString("course"),
+                        rs.getByte("group")
                 )
         );
     }
@@ -153,14 +121,12 @@ public class CourseRepo {
      * @param courseId
      * @return all courses conflicting with the given course
      */
-    public List<CourseWrapper> findAllConflicting(Long courseId) {
-        String SQL_GET_CONFLICTING = "SELECT K.conf_no, K.sec_course_no AS courseId, CONCAT(S.subj_abv,' ',C.course_level) AS courseShort\n" +
-                "FROM Conflicting_Courses K JOIN Courses C ON K.sec_course_no = C.course_no JOIN Subjects S ON C.subj_no = S.subj_no WHERE K.course_no=?";
-        return jdbc.query(SQL_GET_CONFLICTING, new Object[]{courseId}, (rs, numRow) ->
+    public List<CourseWrapper> findAllConflicting(Integer courseId) {
+        return jdbc.query("CALL FIND_ALL_CONFLICTING_COURSES(?)", new Object[]{courseId}, (rs, numRow) ->
                 new CourseWrapper(
-                        rs.getLong("K.conf_no"),
-                        rs.getLong("courseId"),
-                        rs.getString("courseShort")
+                        rs.getInt("K.conf_no"),
+                        rs.getInt("course_no"),
+                        rs.getString("course")
                 )
         );
     }
@@ -171,10 +137,11 @@ public class CourseRepo {
      * @param prereq
      * @return updated course
      */
-    public Course addPrerequisite(Long courseId, CourseWrapper prereq) {
+    public Course addPrerequisite(Integer courseId, CourseWrapper prereq) {
         try {
             /* update prereq */
-            jdbc.update("INSERT INTO Prerequisites(course_no,sec_course_no,prereq_group) VALUES(?,?,?)", courseId, prereq.getCourseNo(), prereq.getGroup());
+            jdbc.update("INSERT INTO Prerequisites(course_no,sec_course_no,prereq_group) VALUES(?,?,?)",
+                    courseId, prereq.getCourseNo(), prereq.getGroup());
             /* return updated course */
             return this.findCourseById(courseId);
         } catch (EmptyResultDataAccessException ex) {
@@ -188,10 +155,11 @@ public class CourseRepo {
      * @param confCourse
      * @return updated course
      */
-    public Course addConflictingCourse(Long courseId, CourseWrapper confCourse) {
+    public Course addConflictingCourse(Integer courseId, CourseWrapper confCourse) {
         try {
             /* update conflicting course */
-            jdbc.update("INSERT INTO Conflicting_Course(course_no,sec_course_no) VALUES(?,?)", courseId, confCourse.getCourseNo());
+            jdbc.update("INSERT INTO ConflictingCourses(course_no,sec_course_no) VALUES(?,?)",
+                    courseId, confCourse.getCourseNo());
             /* return updated course */
             return this.findCourseById(courseId);
         } catch (EmptyResultDataAccessException ex) {
@@ -199,23 +167,11 @@ public class CourseRepo {
         }
     }
 
-    private int findNumPrerequisites(Long courseId) {
-        return jdbc.queryForObject("SELECT COUNT(*) AS numPrereq FROM Prerequisites WHERE course_no=?",
-                new Object[]{courseId}, (rs, numRow) -> rs.getInt("numPrereq")
-        );
-    }
-
-    private int findNumConflictingCourses(Long courseId) {
-        return jdbc.queryForObject("SELECT COUNT(*) AS numConf FROM Conflicting_Courses WHERE course_no=?",
-                new Object[]{courseId}, (rs, numRow) -> rs.getInt("numConf")
-        );
-    }
-
-    public boolean deletePrereqById(Long id) {
+    public boolean deletePrerequisiteById(Integer id) {
         return jdbc.update("DELETE FROM Prerequisites WHERE prereq_no=?", id) > 0;
     }
 
-    public boolean deleteConflictingById(Long id) {
+    public boolean deleteConflictingById(Integer id) {
         return jdbc.update("DELETE FROM Conflicting_Courses WHERE conf_no=?", id) > 0;
     }
 }

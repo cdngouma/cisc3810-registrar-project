@@ -22,7 +22,7 @@ create table `Courses`(
     subj_no int(2) UNSIGNED NOT NULL,
     course_level int(4) NOT NULL,
     course_name varchar(100),
-    units double(3,1) UNSIGNED NOT NULL,
+    units float(3,1) UNSIGNED NOT NULL,
     course_desc varchar(600)
 );
 
@@ -40,15 +40,15 @@ ALTER TABLE `Prerequisites` ADD FOREIGN KEY(course_no) REFERENCES `Courses`(cour
 ALTER TABLE `Prerequisites` ADD FOREIGN KEY(sec_course_no) REFERENCES `Courses`(course_no) ON DELETE CASCADE;
 ALTER TABLE `Prerequisites` ADD CONSTRAINT `unq_prereq` UNIQUE(course_no, sec_course_no);
 
-create table `Conflicting_Courses`(
+create table `ConflictingCourses`(
 	conf_no int(3) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     course_no int(5) UNSIGNED NOT NULL,
     sec_course_no int(5) UNSIGNED NOT NULL
 );
 
-ALTER TABLE `Conflicting_Courses` ADD FOREIGN KEY(course_no) REFERENCES `Courses`(course_no);
-ALTER TABLE `Conflicting_Courses` ADD FOREIGN KEY(sec_course_no) REFERENCES `Courses`(course_no);
-ALTER TABLE `Conflicting_Courses` ADD CONSTRAINT `unq_prereq` UNIQUE(course_no, sec_course_no);
+ALTER TABLE `ConflictingCourses` ADD FOREIGN KEY(course_no) REFERENCES `Courses`(course_no);
+ALTER TABLE `ConflictingCourses` ADD FOREIGN KEY(sec_course_no) REFERENCES `Courses`(course_no);
+ALTER TABLE `ConflictingCourses` ADD CONSTRAINT `unq_prereq` UNIQUE(course_no, sec_course_no);
 
 create table `Classes`(
 	class_no int(5) UNSIGNED AUTO_INCREMENT PRIMARY KEY,

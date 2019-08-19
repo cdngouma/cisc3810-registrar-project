@@ -23,7 +23,7 @@ public class SubjectRepo {
         // find last inserted row
         return jdbc.queryForObject("SELECT * FROM Subjects WHERE subj_no=(SELECT MAX(subj_no) FROM Subjects)", (rs, rowNum) ->
                 new Subject(
-                        rs.getLong("subj_no"),
+                        rs.getInt("subj_no"),
                         rs.getString("subj_name"),
                         rs.getString("subj_abv")
                 )
@@ -31,10 +31,12 @@ public class SubjectRepo {
     }
 
     /**
+     *
+     * @param subjectId
      * @param subject
      * @return the updated subject
      */
-    public Subject update(Long subjectId, Subject subject) {
+    public Subject update(Integer subjectId, Subject subject) {
         try {
             String SQL = "UPDATE Subjects SET subj_name=COALESCE(?,subj_name), subj_abv=COALESCE(?,subj_abv) WHERE subj_no=?";
             jdbc.update(SQL, subject.getName(), subject.getNameShort(), subjectId);
@@ -47,18 +49,18 @@ public class SubjectRepo {
     public List<Subject> findAll() {
         return jdbc.query("SELECT * FROM Subjects", (rs, rowNum) ->
                 new Subject(
-                        rs.getLong("subj_no"),
+                        rs.getInt("subj_no"),
                         rs.getString("subj_name"),
                         rs.getString("subj_abv")
                 )
         );
     }
 
-    public Subject findById(Long subjectNo) {
+    public Subject findById(Integer subjectNo) {
         try {
             return jdbc.queryForObject("SELECT * FROM Subjects WHERE subj_no = ?", new Object[]{subjectNo}, (rs, numRow) ->
                     new Subject(
-                            rs.getLong("subj_no"),
+                            rs.getInt("subj_no"),
                             rs.getString("subj_name"),
                             rs.getString("subj_abv")
                     )
@@ -68,11 +70,7 @@ public class SubjectRepo {
         }
     }
 
-    public boolean deleteById(Long subjectNo) {
+    public boolean deleteById(Integer subjectNo) {
         return jdbc.update("DELETE FROM Subjects WHERE subj_no=?", subjectNo) > 0;
-    }
-
-    public boolean deleteAll() {
-        return jdbc.update("DELETE * FROM Subjects WHERE subj_no IS NOT NULL") > 0;
     }
 }

@@ -6,24 +6,24 @@ import javax.validation.constraints.Size;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Subject {
-    private Long id;
+    private Integer id;
     private String name;
     @Size(min=4, max=4)
     private String nameShort;
 
     public Subject(){}
 
-    public Subject(Long id, String name, String nameShort) {
+    public Subject(Integer id, String name, String nameShort) {
         this.id = id;
         this.name = name;
         this.nameShort = nameShort;
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

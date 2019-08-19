@@ -23,7 +23,7 @@ public class SemesterRepo {
         jdbc.update(SQL, s.getSemester(), s.getStartDate(), s.getEndDate());
         return jdbc.queryForObject("SELECT * FROM Semesters WHERE sem_no=(SELECT MAX(sem_no) FROM Semesters)", (rs, numRow) ->
                 new Semester(
-                        rs.getLong("sem_no"),
+                        rs.getInt("sem_no"),
                         rs.getString("sem_name"),
                         rs.getDate("start_date"),
                         rs.getDate("end_date")
@@ -53,7 +53,7 @@ public class SemesterRepo {
     public List<Semester> findAll() {
         return jdbc.query("SELECT * FROM Semesters", (rs, numRow) ->
                 new Semester(
-                        rs.getLong("sem_no"),
+                        rs.getInt("sem_no"),
                         rs.getString("sem_name"),
                         rs.getDate("start_date"),
                         rs.getDate("end_date")
@@ -67,7 +67,7 @@ public class SemesterRepo {
     public List<Semester> findAllCurrent() {
         return jdbc.query("SELECT * FROM Semesters WHERE start_date >= CURDATE()", (rs, numRow) ->
                 new Semester(
-                        rs.getLong("sem_no"),
+                        rs.getInt("sem_no"),
                         rs.getString("sem_name"),
                         rs.getDate("start_date"),
                         rs.getDate("end_date")
@@ -79,7 +79,7 @@ public class SemesterRepo {
         try {
             return jdbc.queryForObject("SELECT * FROM Semesters WHERE sem_no=?", new Object[]{semId}, (rs, numRow) ->
                     new Semester(
-                            rs.getLong("sem_no"),
+                            rs.getInt("sem_no"),
                             rs.getString("sem_name"),
                             rs.getDate("start_date"),
                             rs.getDate("end_date")

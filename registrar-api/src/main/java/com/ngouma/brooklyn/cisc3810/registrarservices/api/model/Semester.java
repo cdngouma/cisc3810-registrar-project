@@ -5,25 +5,25 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.util.Date;
 
 public class Semester {
-    private Long id;
+    private Integer id;
     private String semester;
     @DateTimeFormat
     private Date startDate;
     @DateTimeFormat
     private Date endDate;
 
-    public Semester(Long id, String semester, Date startDate, Date endDate) {
+    public Semester(Integer id, String semester, Date startDate, Date endDate) {
         this.id = id;
         this.semester = semester;
         this.startDate = startDate;
         this.endDate = endDate;
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

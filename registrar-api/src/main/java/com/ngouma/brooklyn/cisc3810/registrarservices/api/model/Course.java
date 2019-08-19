@@ -6,26 +6,27 @@ import javax.validation.constraints.Positive;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Course {
-    private Long id;
-    private Long subjectId;
+    private Integer id;
+    private Integer subjectId;
+    private String subjectName;
     @Positive
-    private int level;
+    private short level;
     private String name;
     @Positive
-    private double units;
+    private float units;
     private String desc;
 
-    private int numConflictingCourses;
-    private int numPrerequisites;
+    private byte numConflictingCourses;
+    private byte numPrerequisites;
 
     public Course(){}
 
-    public Course(Long id, String courseNameLong){
+    public Course(Integer id, String courseNameLong){
         this.id = id;
         this.name = courseNameLong;
     }
 
-    public Course(Long id, Long subjectId, int level, String name, double units, String desc) {
+    public Course(Integer id, Integer subjectId, short level, String name, float units, String desc) {
         this.id = id;
         this.subjectId = subjectId;
         this.level = level;
@@ -34,9 +35,10 @@ public class Course {
         this.desc = desc;
     }
 
-    public Course(Long id, Long subjectId, int level, String name, double units, String desc, int numPrereq, int numConf) {
+    public Course(Integer id, Integer subjectId, String subjectName, short level, String name, float units, String desc, byte numPrereq, byte numConf) {
         this.id = id;
         this.subjectId = subjectId;
+        this.subjectName = subjectName;
         this.level = level;
         this.name = name;
         this.units = units;
@@ -45,27 +47,27 @@ public class Course {
         this.numConflictingCourses = numConf;
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public Long getSubjectId() {
+    public Integer getSubjectId() {
         return subjectId;
     }
 
-    public void setSubjectId(Long subjectId) {
+    public void setSubjectId(Integer subjectId) {
         this.subjectId = subjectId;
     }
 
-    public int getLevel() {
+    public short getLevel() {
         return level;
     }
 
-    public void setLevel(int level) {
+    public void setLevel(short level) {
         this.level = level;
     }
 
@@ -77,11 +79,11 @@ public class Course {
         this.name = name;
     }
 
-    public double getUnits() {
+    public float getUnits() {
         return units;
     }
 
-    public void setUnits(double units) {
+    public void setUnits(float units) {
         this.units = units;
     }
 
@@ -93,19 +95,19 @@ public class Course {
         this.desc = desc;
     }
 
-    public int getNumPrerequisites() {
+    public byte getNumPrerequisites() {
         return numPrerequisites;
     }
 
-    public void setNumPrerequisites(int prerequisites) {
+    public void setNumPrerequisites(byte prerequisites) {
         this.numPrerequisites = prerequisites;
     }
 
-    public int getNumConflictingCourses() {
+    public byte getNumConflictingCourses() {
         return numConflictingCourses;
     }
 
-    public void setNumConflictingCourses(int conflictingCourses) {
+    public void setNumConflictingCourses(byte conflictingCourses) {
         this.numConflictingCourses = conflictingCourses;
     }
 }

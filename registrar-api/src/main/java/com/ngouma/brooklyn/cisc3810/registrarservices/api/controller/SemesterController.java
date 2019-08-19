@@ -12,7 +12,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "/semesters")
+@RequestMapping(path = "/api/v1")
 public class SemesterController {
     @Autowired
     private SemesterRepo semesterRepo;
@@ -20,28 +20,28 @@ public class SemesterController {
     @Autowired
     private ClassRepo classRepo;
 
-    @GetMapping
+    @GetMapping(path = "/semesters")
     public List<Semester> getAllSemesters(@RequestParam(value = "current") boolean current){
         if(current) return semesterRepo.findAllCurrent();
         return semesterRepo.findAll();
     }
 
-    @GetMapping(path = "/{id}")
+    @GetMapping(path = "/semesters/{id}")
     public Semester getSemester(@PathVariable(value = "id") Long semId){
         return semesterRepo.findById(semId);
     }
 
-    @PostMapping
+    @PostMapping("/semesters")
     public Semester createSemester(@Valid @RequestBody Semester semester){
         return semesterRepo.save(semester);
     }
 
-    @PutMapping(path = "/{id}")
+    @PutMapping(path = "/semesters/{id}")
     public Semester updateSemester(@PathVariable(value = "id") Long semId, @Valid @RequestBody Semester details){
         return semesterRepo.update(semId, semesterRepo.update(semId, details));
     }
 
-    @DeleteMapping(path = "{id}")
+    @DeleteMapping(path = "/semesters/{id}")
     public ResponseEntity<?> deleteCourse(@PathVariable(value = "id") Long semId){
         if(semesterRepo.deleteById(semId))
             return new ResponseEntity<>(HttpStatus.OK);

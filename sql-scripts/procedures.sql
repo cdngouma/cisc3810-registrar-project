@@ -1,107 +1,110 @@
-/**
-/* TODO: Optimize if-else statement
-**/
 DELIMITER $$
-CREATE PROCEDURE `find_all_classes`(IN subjId int, IN range_dir varchar(8), IN lvl int, IN opened boolean)
+CREATE PROCEDURE `FIND_ALL_COURSES` (IN subjNo int)
 BEGIN
-	/* retrun courses with level greather/lower than given level */
-	IF range_dir IS NOT NULL AND lvl IS NOT NULL THEN
-		IF range_dir = 'GREATHER' THEN
-			IF subjId IS NOT NULL THEN
-                SELECT C.*, COUNT(P.prereq_no) AS 'numPrereq', COUNT(K.conf_no) AS 'numConf'
-				FROM Courses C 
-				LEFT JOIN Prerequisits P ON C.course_no=P.course_no
-				LEFT JOIN Conflicting_Courses K ON C.course_no=K.course_no
-				WHERE course_level > lvl AND subj_no=subjId
-				GROUP BY C.course_no;
-			ELSE
-                SELECT C.*, COUNT(P.prereq_no) AS 'numPrereq', COUNT(K.conf_no) AS 'numConf'
-				FROM Courses C 
-				LEFT JOIN Prerequisits P ON C.course_no=P.course_no
-				LEFT JOIN Conflicting_Courses K ON C.course_no=K.course_no
-				WHERE course_level > lvl
-				GROUP BY C.course_no;
-			END IF;
-		ELSEIF range_dir = 'LESS' THEN
-			IF subjId IS NOT NULL THEN
-                SELECT C.*, COUNT(P.prereq_no) AS 'numPrereq', COUNT(K.conf_no) AS 'numConf'
-				FROM Courses C 
-				LEFT JOIN Prerequisits P ON C.course_no=P.course_no
-				LEFT JOIN Conflicting_Courses K ON C.course_no=K.course_no
-				WHERE course_level < lvl AND subj_no=subjId
-				GROUP BY C.course_no;
-			ELSE
-                SELECT C.*, COUNT(P.prereq_no) AS 'numPrereq', COUNT(K.conf_no) AS 'numConf'
-				FROM Courses C 
-				LEFT JOIN Prerequisits P ON C.course_no=P.course_no
-				LEFT JOIN Conflicting_Courses K ON C.course_no=K.course_no
-				WHERE course_level < lvl
-				GROUP BY C.course_no;
-			END IF;
-		END IF;
-        
-    /* return all courses of the given level and subject */
-    ELSEIF subjId IS NOT NULL AND range_dir IS NULL AND lvl IS NOT NULL THEN
-        SELECT C.*, COUNT(P.prereq_no) AS 'numPrereq', COUNT(K.conf_no) AS 'numConf'
-		FROM Courses C 
-		LEFT JOIN Prerequisits P ON C.course_no=P.course_no
-		LEFT JOIN Conflicting_Courses K ON C.course_no=K.course_no
-        WHERE course_level = lvl AND subj_no = subjId
-		GROUP BY C.course_no;
-        
-	/* return all courses of the given level */
-	ELSEIF subjId IS NULL AND range_dir IS NULL AND lvl IS NOT NULL THEN
-		SELECT C.*, COUNT(P.prereq_no) AS 'numPrereq', COUNT(K.conf_no) AS 'numConf'
-		FROM Courses C 
-		LEFT JOIN Prerequisits P ON C.course_no=P.course_no
-		LEFT JOIN Conflicting_Courses K ON C.course_no=K.course_no
-        WHERE course_level = lvl
-		GROUP BY C.course_no;
-        
-     /* return all courses corresponding to a given subject */    
-	ELSEIF subjId IS NOT NULL AND range_dir IS NULL AND lvl IS NULL THEN
-        SELECT C.*, COUNT(P.prereq_no) AS 'numPrereq', COUNT(K.conf_no) AS 'numConf'
-		FROM Courses C 
-		LEFT JOIN Prerequisits P ON C.course_no=P.course_no
-		LEFT JOIN Conflicting_Courses K ON C.course_no=K.course_no
-        WHERE subj_no = subjId
-		GROUP BY C.course_no;
-        
-	/* return all courses if no filter specified */
-	ELSEIF subjId IS NULL AND range_dir IS NULL AND lvl IS NULL THEN
-		SELECT C.*, COUNT(P.prereq_no) AS 'numPrereq', COUNT(K.conf_no) AS 'numConf'
-		FROM Courses C 
-		LEFT JOIN Prerequisits P ON C.course_no=P.course_no
-		LEFT JOIN Conflicting_Courses K ON C.course_no=K.course_no
-		GROUP BY C.course_no
-        ORDER BY subj_no, course_level;
+	IF subjNo IS NOT NULL THEN
+    /* Fetch all courses */
+		SELECT C.*, S.subj_abv, COUNT(P.prereq_no) AS 'numPrereq', COUNT(K.conf_no) AS 'numConflicting'
+		FROM Courses C
+		JOIN Subjects S ON S.subj_no=C.subj_no
+        LEFT JOIN Prerequisites P ON C.course_no=P.course_no
+		LEFT JOIN ConflictingCourses K ON C.course_no=K.course_no
+        WHERE C.subj_no=subjNo
+        GROUP BY C.course_no
+        ORDER BY C.course_no;
+	ELSE
+	/* Fetch all courses per subject */
+		SELECT C.*, S.subj_abv, COUNT(P.prereq_no) AS 'numPrereq', COUNT(K.conf_no) AS 'numConflicting'
+		FROM Courses C
+		JOIN Subjects S ON S.subj_no=C.subj_no
+        LEFT JOIN Prerequisites P ON C.course_no=P.course_no
+		LEFT JOIN ConflictingCourses K ON C.course_no=K.course_no
+        GROUP BY C.course_no
+        ORDER BY C.course_no;
 	END IF;
 END; $$
 DELIMITER ;
 
-/*
-SELECT K.class_no, K.course_no, CONCAT(S.subj_abv,' ',C.course_level,' - ',C.course_name) AS courseName, K.instr_name, 
-	CONCAT(Z.sem_name,' ',YEAR(Z.start_date)) AS sem, K.room, K.capacity, K.num_enrolled, K.`mode`, K.opened, K.start_time, K.end_time
-FROM Classes K
-JOIN Courses C on C.course_no=K.course_no
-JOIN Subjects S on S.subj_no=C.subj_no
-JOIN Semesters Z on Z.sem_no=K.sem_no
-WHERE K.sem_no=7 AND K.opened=TRUE;
+DELIMITER $$
+CREATE PROCEDURE `FIND_ALL_COURSE_PREREQ` (IN courseNo int)
+BEGIN
+	SELECT P.prereq_no, P.sec_course_no AS course_no, CONCAT(S.subj_abv,' ',C.course_level) AS course, P.prereq_group AS `group`
+	FROM Prerequisites P
+	JOIN Courses C on P.sec_course_no = C.course_no
+	JOIN Subjects S on C.subj_no = S.subj_no
+	WHERE P.course_no=courseNo
+	ORDER BY `group`, course_no;
+END; $$
+DELIMITER ;
 
-SELECT K.class_no, K.course_no, CONCAT(S.subj_abv,' ',C.course_level,' - ',C.course_name) AS courseName, K.instr_name, 
-	CONCAT(Z.sem_name,' ',YEAR(Z.start_date)) AS sem, K.room, K.capacity, K.num_enrolled, K.`mode`, K.opened, K.start_time, K.end_time
-FROM Classes K
-JOIN Courses C on C.course_no=K.course_no
-JOIN Subjects S on S.subj_no=C.subj_no
-JOIN Semesters Z on Z.sem_no=K.sem_no
-WHERE K.sem_no=7
-	AND K.opened=TRUE
-	AND C.course_level <= 3000;
-    AND C.subj_no = 3; 
-/*
-CALL FIND_ALL_COURSES(null, null, null);
-CALL FIND_ALL_COURSES(null, 'GREATHER', 2000);
-CALL FIND_ALL_COURSES(null, 'LESS', 2000);
-CALL FIND_ALL_COURSES(3, 'GREATHER', 4000);
-CALL FIND_ALL_COURSES(null, null, 3130);
-*/
+DELIMITER $$
+CREATE PROCEDURE `FIND_ALL_CONFLICTING_COURSES` (IN courseNo int)
+BEGIN
+	SELECT K.conf_no, K.sec_course_no AS course_no, CONCAT(S.subj_abv,' ',C.course_level) AS course
+	FROM ConflictingCourses K
+	JOIN Courses C on K.sec_course_no = C.course_no
+	JOIN Subjects S on C.subj_no = S.subj_no
+	WHERE K.course_no=courseNo
+	ORDER BY course_no;
+END; $$
+DELIMITER ;
+
+/* semId = semester ID, subj = subject abreviation (4 letters), range = less or greater than */
+DELIMITER $$
+CREATE PROCEDURE `FIND_ALL_CLASSES`(IN semId int, IN subj varchar(4), IN `range` varchar(7), IN `level` int, IN opened boolean)
+BEGIN
+	/* K = classes, C = courses, S = subjects, Z = semesters */
+    SELECT K.class_no, CONCAT(S.subj_abv,' ',C.course_level) AS course_code, C.course_name, K.instr_name, 
+	CONCAT(Z.sem_name,' ',YEAR(Z.start_date)) AS semester, K.start_time, K.end_time, K.room, K.capacity, K.num_enrolled, K.`mode`, K.opened
+	FROM Classes K
+	JOIN Courses C on C.course_no=K.Course_no
+	JOIN Subjects S on S.subj_no=C.subj_no
+	JOIN Semesters Z on Z.sem_no=K.sem_no
+	WHERE K.sem_no = semId
+		/* If a subject is specified return all classes with given subject */
+		AND (subj IS NULL OR C.subj_no=(SELECT subj_no FROM Subjects WHERE UPPER(subj_abv)=UPPER(subj)))
+        /* If a range and level is provided, */
+        AND ((`range` IS NULL AND `level` IS NULL) OR (
+				UPPER(`range`) NOT IN ('GREATER','LESS')
+				/* return all classes with courses >= than the level */
+				OR (UPPER(`range`)='GREATER' AND C.course_level >= `level`)
+				/* or all classes with courses <= the level */
+				OR (UPPER(`range`)='LESS' AND C.course_level <= `level`)
+				)
+			)
+		/* If opened return all opened classes else include closed classes */
+		AND (opened<>TRUE OR K.opened=TRUE);
+END ;
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE `FIND_CLASS_BY_ID` (IN classId int)
+BEGIN
+	SELECT K.class_no, CONCAT(S.subj_abv,' ',C.course_level) AS course_code, C.course_name, K.instr_name, 
+	CONCAT(Z.sem_name,' ',YEAR(Z.start_date)) AS semester, K.start_time, K.end_time, K.room, K.capacity, K.num_enrolled, K.`mode`, K.opened
+	FROM Classes K
+	JOIN Courses C on C.course_no=K.Course_no
+	JOIN Subjects S on S.subj_no=C.subj_no
+	JOIN Semesters Z on Z.sem_no=K.sem_no
+	WHERE K.class_no = classId;
+END; $$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE `FIND_COURSE_BY_ID` (IN courseId int)
+BEGIN
+	SELECT C.*, S.subj_abv, COUNT(P.prereq_no) AS 'numPrereq', COUNT(K.conf_no) AS 'numConflicting'
+	FROM Courses C
+	JOIN Subjects S ON S.subj_no=C.subj_no
+	LEFT JOIN Prerequisites P ON C.course_no=P.course_no
+	LEFT JOIN ConflictingCourses K ON C.course_no=K.course_no
+	WHERE C.course_no=courseId
+	GROUP BY C.course_no;
+END; $$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE `FIND_COURSE_FROM_CLASS` (IN classId int)
+BEGIN
+	CALL FIND_COURSE_BY_ID((SELECT course_no FROM Classes WHERE class_no=classId));
+END; $$
+DELIMITER ;
