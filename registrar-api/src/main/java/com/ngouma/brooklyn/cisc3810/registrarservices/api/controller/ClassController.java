@@ -36,7 +36,7 @@ public class ClassController {
     }
 
     @PutMapping("/classes/{id}")
-    public ClassEntity updateClassInfo(@PathVariable(value = "id") Integer classId, @Valid @RequestBody ClassEntity details){
+    public ClassEntity updateClassInfo(@PathVariable(value = "id") Integer classId, @RequestBody ClassEntity details){
         return classRepo.update(classId, details);
     }
 

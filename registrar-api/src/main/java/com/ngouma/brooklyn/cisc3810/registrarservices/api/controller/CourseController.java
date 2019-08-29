@@ -58,7 +58,7 @@ public class CourseController {
     }
 
     @PutMapping(path = "/courses/{id}")
-    public Course updateCourse(@PathVariable(name = "id") Integer courseId, @Valid @RequestBody Course details){
+    public Course updateCourse(@PathVariable(name = "id") Integer courseId, @RequestBody Course details){
         return courseRepo.updateCourse(courseId, details);
     }
 

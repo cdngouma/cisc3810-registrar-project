@@ -17,40 +17,38 @@ public class CourseRepo {
 
     // COURSE CORE
 
-    /**
-     * @param c (course)
-     * @return the newly created course
-     */
     public Course save(Course c) {
-        String SQL = "INSERT INTO Courses(subj_no,course_level,course_name,units,course_desc) VALUE(?,?,?,?,?)";
-        jdbc.update(SQL, c.getSubjectId(), c.getLevel(), c.getName(), c.getUnits(), c.getDescription());
-        /* get last added row */
-        return jdbc.queryForObject("SELECT * FROM Courses WHERE course_no=(SELECT MAX(course_no) FROM Courses)", (rs, numRow) ->
-                new Course(
-                        rs.getInt("course_no"),
-                        rs.getInt("subj_no"),
-                        rs.getShort("course_level"),
-                        rs.getString("course_name"),
-                        rs.getFloat("units"),
-                        rs.getString("course_desc")
-                )
-        );
+        try {
+            return jdbc.queryForObject("CALL EDIT_COURSES(?,?,?,?,?,?)", new Object[]{c.getSubjectId(), c.getLevel(),
+                    c.getName(), c.getUnits(), c.getDescription()}, (rs, numRow) ->
+                    new Course(
+                            rs.getInt("course_no"),
+                            rs.getInt("subj_no"),
+                            rs.getShort("course_level"),
+                            rs.getString("course_name"),
+                            rs.getFloat("units"),
+                            rs.getString("course_desc")
+                    )
+            );
+        }catch (EmptyResultDataAccessException ex) {
+            throw new EntityNotFoundException();
+        }
     }
 
-    /**
-     * @param courseId
-     * @param c (course)
-     * @return the updated course
-     */
     public Course updateCourse(Integer courseId, Course c) {
         try {
-            /* update course */
-            String UPDATE_COURSE = "UPDATE Courses SET subj_no=COALESCE(?,subj_no), course_level=COALESCE(?,course_level)," +
-                    "course_name=COALESCE(?,course_name), units=COALESCE(?,units), course_desc=COALESCE(?,course_desc) WHERE course_no=?";
-            jdbc.update(UPDATE_COURSE, c.getSubjectId(), c.getLevel(), c.getName(), c.getUnits(), c.getDescription(), c.getId());
-            /* retrun object */
-            return findCourseById(courseId);
-        } catch (EmptyResultDataAccessException ex) {
+            return jdbc.queryForObject("CALL EDIT_COURSES(?,?,?,?,?,?)", new Object[]{c.getSubjectId(), c.getLevel(),
+                    c.getName(), c.getUnits(), c.getDescription()}, (rs, numRow) ->
+                    new Course(
+                            rs.getInt("course_no"),
+                            rs.getInt("subj_no"),
+                            rs.getShort("course_level"),
+                            rs.getString("course_name"),
+                            rs.getFloat("units"),
+                            rs.getString("course_desc")
+                    )
+            );
+        }catch (EmptyResultDataAccessException ex) {
             throw new EntityNotFoundException();
         }
     }

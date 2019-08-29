@@ -72,10 +72,29 @@ ALTER TABLE `Classes` ADD CONSTRAINT `ck_class_mode` CHECK(UPPER(`mode`) IN('IN-
 ALTER TABLE `Classes` ADD CONSTRAINT `ck_room_fmt` CHECK(REGEXP_LIKE(UPPER(room), '^([A-Z]{2}) ([0-9]{3,4})$'));
 ALTER TABLE `Classes` ADD CONSTRAINT `ck_room_capacity` CHECK(num_enrolled <= capacity);
 
+/** TODO: improve meeting days table */
 create table `MeetingDays`(
 	md_no int(5) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     class_no int(5) UNSIGNED NOT NULL,
     m_day int(1) UNSIGNED NOT NULL
 );
-
 ALTER TABLE `MeetingDays` ADD CONSTRAINT `unq_meeting_day` UNIQUE(m_day, class_no);
+
+create table `Students`(
+	student_no int(8) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    email_address varchar(255) UNIQUE,
+    first_name varchar(100) NOT NULL,
+    last_name varchar(100) NOT NULL,
+    gender varchar(6),
+    dob date,
+    degree varchar(7),
+    major varchar(100),
+    division char(1) NOT NULL,
+    gpa double(3,2) UNSIGNED
+);
+
+ALTER TABLE `Students` ADD CONSTRAINT `ck_email` CHECK(REGEXP_LIKE(email_address, '^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'));
+ALTER TABLE `Students` ADD CONSTRAINT `ck_gender` CHECK(UPPER(gender) IN('MALE','FEMALE'));
+ALTER TABLE `Students` ADD CONSTRAINT `ck_major` CHECK( (degree IS NOT NULL AND major IS NOT NULL) OR (degree IS NULL AND major IS NULL));
+ALTER TABLE `Students` ADD CONSTRAINT `ck_division` CHECK(UPPER(division) IN('U','G'));
+ALTER TABLE `Students` ADD CONSTRAINT `ck_gpa` CHECK(gpa <= 4.00);

@@ -14,34 +14,29 @@ public class SemesterRepo {
     @Autowired
     private JdbcTemplate jdbc;
 
-    /**
-     * @param s (new semester)
-     * @return the newly created semester
-     */
     public Semester save(Semester s) {
-        String SQL = "INSERT INTO Semesters(sem_name, start_date, end_date) VALUES(?,?,?)";
-        jdbc.update(SQL, s.getSemester(), s.getStartDate(), s.getEndDate());
-        return jdbc.queryForObject("SELECT * FROM Semesters WHERE sem_no=(SELECT MAX(sem_no) FROM Semesters)", (rs, numRow) ->
-                new Semester(
-                        rs.getInt("sem_no"),
-                        rs.getString("sem_name"),
-                        rs.getDate("start_date"),
-                        rs.getDate("end_date")
-                )
-        );
+        try {
+            return jdbc.queryForObject("CALL EDIT_SEMESTERS(?,?,?,?)", new Object[]{s.getId(), s.getSemester(), s.getStartDate(), s.getEndDate()},
+                    (rs, numRow) -> new Semester(
+                            rs.getInt("sem_no"),
+                            rs.getString("sem_name"),
+                            rs.getDate("start_date"),
+                            rs.getDate("end_date")
+                    ));
+        } catch (EmptyResultDataAccessException ex) {
+            throw new EntityNotFoundException();
+        }
     }
 
-    /**
-     * @param semId
-     * @param semester
-     * @return the updated semester
-     */
-    public Semester update(Long semId, Semester semester) {
+    public Semester update(Integer semId, Semester semester) {
         try {
-            jdbc.update("UPDATE Semesters SET sem_name=COALESCE(?,sem_name), start_date=COALESCE(?,start_date), " +
-                            "end_date=COALESCE(?,end_date) WHERE sem_no=?",
-                    semester.getSemester(), semester.getStartDate(), semester.getEndDate(), semId);
-            return this.findById(semId);
+            return jdbc.queryForObject("CALL EDIT_SEMESTERS(?,?,?,?)", new Object[]{semId, semester.getSemester(), semester.getStartDate(), semester.getEndDate()},
+                    (rs, numRow) -> new Semester(
+                            rs.getInt("sem_no"),
+                            rs.getString("sem_name"),
+                            rs.getDate("start_date"),
+                            rs.getDate("end_date")
+                    ));
         } catch (EmptyResultDataAccessException ex) {
             throw new EntityNotFoundException();
         }

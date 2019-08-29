@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
-@SuppressWarnings("ConstantConditions")
 @Repository
 public class ClassRepo {
     @Autowired

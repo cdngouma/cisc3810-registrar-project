@@ -14,34 +14,32 @@ public class SubjectRepo {
     @Autowired
     private JdbcTemplate jdbc;
 
-    /**
-     * @param subject
-     * @return the newly added subject
-     */
-    public Subject save(Subject subject) {
-        jdbc.update("INSERT INTO Subjects(subj_name, subj_abv) VALUES(?,?)", subject.getName(), subject.getNameShort());
-        // find last inserted row
-        return jdbc.queryForObject("SELECT * FROM Subjects WHERE subj_no=(SELECT MAX(subj_no) FROM Subjects)", (rs, rowNum) ->
-                new Subject(
-                        rs.getInt("subj_no"),
-                        rs.getString("subj_name"),
-                        rs.getString("subj_abv")
-                )
-        );
+    public Subject save(Subject s) {
+        try {
+            return jdbc.queryForObject("CALL EDIT_SUBJECTS(?,?,?)", new Object[]{s.getId(), s.getName(), s.getNameShort()},
+                    (rs, numRow) ->
+                            new Subject(
+                                    rs.getInt("subj_no"),
+                                    rs.getString("subj_name"),
+                                    rs.getString("subj_abv")
+                            )
+            );
+        }catch (EmptyResultDataAccessException ex) {
+            throw new EntityNotFoundException();
+        }
     }
 
-    /**
-     *
-     * @param subjectId
-     * @param subject
-     * @return the updated subject
-     */
-    public Subject update(Integer subjectId, Subject subject) {
+    public Subject update(Integer id, Subject s) {
         try {
-            String SQL = "UPDATE Subjects SET subj_name=COALESCE(?,subj_name), subj_abv=COALESCE(?,subj_abv) WHERE subj_no=?";
-            jdbc.update(SQL, subject.getName(), subject.getNameShort(), subjectId);
-            return this.findById(subjectId);
-        } catch (EmptyResultDataAccessException ex) {
+            return jdbc.queryForObject("CALL EDIT_SUBJECTS(?,?,?)", new Object[]{id, s.getName(), s.getNameShort()},
+                    (rs, numRow) ->
+                            new Subject(
+                                    rs.getInt("subj_no"),
+                                    rs.getString("subj_name"),
+                                    rs.getString("subj_abv")
+                            )
+            );
+        }catch (EmptyResultDataAccessException ex) {
             throw new EntityNotFoundException();
         }
     }

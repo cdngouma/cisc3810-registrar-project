@@ -12,7 +12,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "/api/v1")
+@RequestMapping(path = "/api")
 public class SemesterController {
     @Autowired
     private SemesterRepo semesterRepo;
@@ -37,7 +37,7 @@ public class SemesterController {
     }
 
     @PutMapping(path = "/semesters/{id}")
-    public Semester updateSemester(@PathVariable(value = "id") Long semId, @Valid @RequestBody Semester details){
+    public Semester updateSemester(@PathVariable(value = "id") Integer semId, @RequestBody Semester details){
         return semesterRepo.update(semId, semesterRepo.update(semId, details));
     }
 

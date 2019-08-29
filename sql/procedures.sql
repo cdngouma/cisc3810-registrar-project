@@ -1,4 +1,82 @@
 DELIMITER $$
+CREATE PROCEDURE `EDIT_SUBJECTS` (IN _subjNo int, _subjName varchar(255), _subjAbv varchar(4))
+BEGIN
+	IF subjNo IS NULL THEN
+		INSERT INTO `Subjects`(subj_name, subj_abv) VALUES(_subjName, _subjAbv);
+	ELSE
+		UPDATE `Subjects` SET subj_name=COALESCE(subjName, subj_name), subj_abv=COALESCE(_subjAbv, subj_abv)
+        WHERE subj_no = _subjNo;
+	END IF;
+    
+    SELECT * FROM `Subjects` WHERE subj_no = COALESCE(_subjNo, (SELECT MAX(subj_no) FROM `Subjects`));
+    
+END; $$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE `EDIT_SEMESTERS` (IN _semId int, _semName varchar(255), _startDate date, _endDate date)
+BEGIN
+	IF _semId IS NULL THEN
+		INSERT INTO `Semesters`(sem_name, start_date, end_date) VALUES(_semName, _startDate, _endDate);
+	ELSE
+		UPDATE Semesters SET sem_name=COALESCE(_semName,sem_name), start_date=COALESCE(_startDate,start_date), end_date=COALESCE(_endDate,end_date)
+        WHERE sem_no=_semId;
+	END IF;
+    
+    SELECT * FROM `Semesters` WHERE sem_no = COALESCE(_semId, (SELECT MAX(sem_no) FROM `Semesters`));    
+END; $$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE `EDIT_COURSES` (
+	IN _courseId int,
+    IN _subjNo int,
+    IN _level int,
+    IN _courseName varchar(255),
+    IN _units float,
+    IN _desc varchar(600)
+)
+BEGIN
+	IF _courseId IS NULL THEN
+		INSERT INTO `Courses`(subj_no, course_level, course_name, units, course_desc) VALUES(_subjNo, _level, _courseName, _units, _desc);
+	ELSE
+		UPDATE `Courses` SET subj_no=COALESCE(_subjNo,subj_no), course_level=COALESCE(_startDate,course_level),
+        course_name=COALESCE(_courseName,course_name), units=COALESCE(_units,units), course_desc=COALESCE(_desc,course_desc)
+        WHERE course_no=_courseId;
+	END IF;
+    
+    SELECT * FROM `Courses` WHERE course_no = COALESCE(_courseId, (SELECT MAX(course_no) FROM `Courses`));    
+END; $$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE `EDIT_STUDENTS`(
+	IN _studentId int,
+    IN _email varchar(255),
+    IN _firstName varchar(255),
+    IN _lastName varchar(255),
+    IN _gender varchar(6),
+    IN _dob date,
+    IN _degree varchar(10),
+    IN _major varchar(255),
+    IN _division char(1),
+    IN _gpa double(3,2)
+)
+BEGIN
+	IF _studentId IS NULL THEN
+		INSERT INTO `Students` VALUES(NULL, _email, _firstName, _lastName, _gender, _dob, _degree, _major, _division, _gpa);
+	ELSE
+		UPDATE `Students` SET email_address=COALESCE(_email,email_address), first_name=COALESCE(_firstName, first_name), 
+        last_name=COALESCE(_lastName,last_name), gender=COALESCE(_gender,gender), dob=COALESCE(_dob,dob), degree=COALESCE(_dergee,degree), 
+        major=COALESCE(_major,major), division=COALESCE(_division,division), gpa=COALESCE=(_gpa,gpa)
+        WHERE student_no=_studentId;
+    END IF;
+    
+    SELECT * FROM `Students` WHERE student_no=COALESCE(_studentId, (SELECT MAX(student_no) FROM `Students`));
+END; $$
+DELIMITER ;
+
+DELIMITER $$
 CREATE PROCEDURE `FIND_ALL_COURSES` (IN subjNo int)
 BEGIN
 	IF subjNo IS NOT NULL THEN

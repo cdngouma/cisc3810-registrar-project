@@ -2,13 +2,10 @@ package com.ngouma.brooklyn.cisc3810.registrarservices.api.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import javax.validation.constraints.Size;
-
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Subject {
     private Integer id;
     private String name;
-    @Size(min=4, max=4)
     private String nameShort;
 
     public Subject(){}

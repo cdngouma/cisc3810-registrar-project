@@ -13,7 +13,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api")
 public class SubjectController {
     @Autowired
     private SubjectRepo subjectRepo;
@@ -36,7 +36,7 @@ public class SubjectController {
     }
 
     @PutMapping(path = "/subjects/{id}")
-    public Subject updateSubject(@PathVariable(value = "id") Integer subjId, @Valid @RequestBody Subject details) {
+    public Subject updateSubject(@PathVariable(value = "id") Integer subjId, @RequestBody Subject details) {
         return subjectRepo.update(subjId, details);
     }
 
