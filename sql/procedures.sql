@@ -1,55 +1,4 @@
 DELIMITER $$
-CREATE PROCEDURE `EDIT_SUBJECTS` (IN _subjNo int, _subjName varchar(255), _subjAbv varchar(4))
-BEGIN
-	IF subjNo IS NULL THEN
-		INSERT INTO `Subjects`(subj_name, subj_abv) VALUES(_subjName, _subjAbv);
-	ELSE
-		UPDATE `Subjects` SET subj_name=COALESCE(subjName, subj_name), subj_abv=COALESCE(_subjAbv, subj_abv)
-        WHERE subj_no = _subjNo;
-	END IF;
-    
-    SELECT * FROM `Subjects` WHERE subj_no = COALESCE(_subjNo, (SELECT MAX(subj_no) FROM `Subjects`));
-    
-END; $$
-DELIMITER ;
-
-DELIMITER $$
-CREATE PROCEDURE `EDIT_SEMESTERS` (IN _semId int, _semName varchar(255), _startDate date, _endDate date)
-BEGIN
-	IF _semId IS NULL THEN
-		INSERT INTO `Semesters`(sem_name, start_date, end_date) VALUES(_semName, _startDate, _endDate);
-	ELSE
-		UPDATE Semesters SET sem_name=COALESCE(_semName,sem_name), start_date=COALESCE(_startDate,start_date), end_date=COALESCE(_endDate,end_date)
-        WHERE sem_no=_semId;
-	END IF;
-    
-    SELECT * FROM `Semesters` WHERE sem_no = COALESCE(_semId, (SELECT MAX(sem_no) FROM `Semesters`));    
-END; $$
-DELIMITER ;
-
-DELIMITER $$
-CREATE PROCEDURE `EDIT_COURSES` (
-	IN _courseId int,
-    IN _subjNo int,
-    IN _level int,
-    IN _courseName varchar(255),
-    IN _units float,
-    IN _desc varchar(600)
-)
-BEGIN
-	IF _courseId IS NULL THEN
-		INSERT INTO `Courses`(subj_no, course_level, course_name, units, course_desc) VALUES(_subjNo, _level, _courseName, _units, _desc);
-	ELSE
-		UPDATE `Courses` SET subj_no=COALESCE(_subjNo,subj_no), course_level=COALESCE(_startDate,course_level),
-        course_name=COALESCE(_courseName,course_name), units=COALESCE(_units,units), course_desc=COALESCE(_desc,course_desc)
-        WHERE course_no=_courseId;
-	END IF;
-    
-    SELECT * FROM `Courses` WHERE course_no = COALESCE(_courseId, (SELECT MAX(course_no) FROM `Courses`));    
-END; $$
-DELIMITER ;
-
-DELIMITER $$
 CREATE PROCEDURE `EDIT_STUDENTS`(
 	IN _studentId int,
     IN _email varchar(255),
@@ -77,112 +26,103 @@ END; $$
 DELIMITER ;
 
 DELIMITER $$
-CREATE PROCEDURE `FIND_ALL_COURSES` (IN subjNo int)
+CREATE PROCEDURE `FIND_COURSE_BY_ID` (IN courseId int)
 BEGIN
-	IF subjNo IS NOT NULL THEN
-    /* Fetch all courses */
-		SELECT C.*, S.subj_abv, COUNT(P.prereq_no) AS 'numPrereq', COUNT(K.conf_no) AS 'numConflicting'
-		FROM Courses C
-		JOIN Subjects S ON S.subj_no=C.subj_no
-        LEFT JOIN Prerequisites P ON C.course_no=P.course_no
-		LEFT JOIN ConflictingCourses K ON C.course_no=K.course_no
-        WHERE C.subj_no=subjNo
-        GROUP BY C.course_no
-        ORDER BY C.course_no;
-	ELSE
-	/* Fetch all courses per subject */
-		SELECT C.*, S.subj_abv, COUNT(P.prereq_no) AS 'numPrereq', COUNT(K.conf_no) AS 'numConflicting'
-		FROM Courses C
-		JOIN Subjects S ON S.subj_no=C.subj_no
-        LEFT JOIN Prerequisites P ON C.course_no=P.course_no
-		LEFT JOIN ConflictingCourses K ON C.course_no=K.course_no
-        GROUP BY C.course_no
-        ORDER BY C.course_no;
-	END IF;
+	SELECT C.id, C.course_name, C.course_level, C.subject_id, S.subject_name, S.subject_short, C.units, C.`description`
+	FROM Courses C
+	JOIN Subjects S ON S.id=C.subject_id
+	WHERE C.id = courseId;
 END; $$
 DELIMITER ;
 
 DELIMITER $$
-CREATE PROCEDURE `FIND_ALL_COURSE_PREREQ` (IN courseNo int)
+CREATE PROCEDURE `FIND_COURSES_BY_SUBJECT_ID` (IN subjNo int)
 BEGIN
-	SELECT P.prereq_no, P.sec_course_no AS course_no, CONCAT(S.subj_abv,' ',C.course_level) AS course, P.prereq_group AS `group`
+	SELECT Courses.id, course_name, course_level, Courses.subject_id, subject_name, subject_short, 
+		COUNT(Prerequisites.id) AS numPrereqs, COUNT(ConflictingCourses.id) AS numConflicting
+	FROM Courses
+	JOIN Subjects S ON S.id = C.subject_id
+    JOIN Prerequisites ON Prerequisites.course_id = Courses.id
+    JOIN ConflictingCourses ON ConflictingCourses.course_id = Courses.id
+	WHERE Courses.subject_id = subjectId
+    GROUP BY Courses.id;
+END; $$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE `FIND_PREREQUISITES` (IN courseNo int)
+BEGIN
+	SELECT P.id, P.prereq_id, CONCAT(Subjects.subject_short,' ', Courses.course_level) AS courseName, P.`group`
 	FROM Prerequisites P
-	JOIN Courses C on P.sec_course_no = C.course_no
-	JOIN Subjects S on C.subj_no = S.subj_no
-	WHERE P.course_no=courseNo
-	ORDER BY `group`, course_no;
+	JOIN Courses ON P.prereq_id = Courses.id
+	JOIN Subjects ON Courses.subject_id = Subjects.id
+	WHERE P.id = courseNo;
 END; $$
 DELIMITER ;
 
 DELIMITER $$
-CREATE PROCEDURE `FIND_ALL_CONFLICTING_COURSES` (IN courseNo int)
+CREATE PROCEDURE `FIND_CONFLICTING_COURSES` (IN courseNo int)
 BEGIN
-	SELECT K.conf_no, K.sec_course_no AS course_no, CONCAT(S.subj_abv,' ',C.course_level) AS course
-	FROM ConflictingCourses K
-	JOIN Courses C on K.sec_course_no = C.course_no
-	JOIN Subjects S on C.subj_no = S.subj_no
-	WHERE K.course_no=courseNo
-	ORDER BY course_no;
+	SELECT C.id, C.conflicting_course_id, CONCAT(Subjects.subject_short,' ', Courses.course_level) AS courseName
+	FROM ConflictingCourses C
+	JOIN Courses ON C.conflicting_course_id = Courses.id
+	JOIN Subjects ON Courses.subject_id = Subjects.subject_id
+	WHERE C.course_id = courseNo;
 END; $$
 DELIMITER ;
 
-/* semId = semester ID, subj = subject abreviation (4 letters), range = less or greater than */
 DELIMITER $$
-CREATE PROCEDURE `FIND_ALL_CLASSES`(IN semId int, IN subj varchar(4), IN `range` varchar(7), IN `level` int, IN opened boolean)
+CREATE PROCEDURE `FIND_CLASSES`(IN semesterId int, IN courseSubject varchar(4), IN levelRange varchar(7), IN isOpened boolean)
 BEGIN
-	/* K = classes, C = courses, S = subjects, Z = semesters */
-    SELECT K.class_no, CONCAT(S.subj_abv,' ',C.course_level) AS course_code, C.course_name, K.instr_name, 
-	CONCAT(Z.sem_name,' ',YEAR(Z.start_date)) AS semester, K.start_time, K.end_time, K.room, K.capacity, K.num_enrolled, K.`mode`, K.opened
-	FROM Classes K
-	JOIN Courses C on C.course_no=K.Course_no
-	JOIN Subjects S on S.subj_no=C.subj_no
-	JOIN Semesters Z on Z.sem_no=K.sem_no
-	WHERE K.sem_no = semId
-		/* If a subject is specified return all classes with given subject */
-		AND (subj IS NULL OR C.subj_no=(SELECT subj_no FROM Subjects WHERE UPPER(subj_abv)=UPPER(subj)))
-        /* If a range and level is provided, */
-        AND ((`range` IS NULL AND `level` IS NULL) OR (
-				UPPER(`range`) NOT IN ('GREATER','LESS')
-				/* return all classes with courses >= than the level */
-				OR (UPPER(`range`)='GREATER' AND C.course_level >= `level`)
-				/* or all classes with courses <= the level */
-				OR (UPPER(`range`)='LESS' AND C.course_level <= `level`)
-				)
-			)
-		/* If opened return all opened classes else include closed classes */
-		AND (opened<>TRUE OR K.opened=TRUE);
-END ;
+	DECLARE rel char(2); 
+    DECLARE courseLevel int;
+    
+    IF(REGEXP_LIKE(levelRange, '^(gt|lt|eq|GT|LT|EQ):([0-9]{4})$') <> 1) THEN
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Incorrect format: " for entity \'level range\'';
+	END IF;
+    
+    SET rel := SUBSTRING(levelRange, 1, 2);
+	SET courseLevel := SUBSTRING(levelRange, 4, 4);
+    
+    SELECT Classes.id, Classes.course_id, Courses.course_name, CONCAT(Subjects.subject_short,' ',Courses.course_level) AS course_code,
+		CONCAT(Instructors.first_name,' ',Instructors.last_name) AS instructor_name,
+        CONCAT(Semesters.semester,' ',YEAR(Semesters.start_date)) AS semester, Semesters.start_date, Semesters.end_date,
+        Classes.start_time, Classes.end_time, Classes.room, Classes.capacity, Classes.num_enrolled, Classes.class_mode, Classes.isopened
+	FROM Classes
+	JOIN Courses ON Courses.id = Classes.Course_id
+	JOIN Subjects ON Subjects.id = Courses.subject_id
+	JOIN Semesters ON Semesters.id = Classes.semester_id
+    JOIN Instructors ON Instructors.id = Classes.instructor_id
+	WHERE Classes.semester_id = semesterId
+		-- If a subject is specified return all classes with given subject
+		AND (courseSubject IS NULL OR Courses.subject_id = (SELECT id FROM Subjects WHERE UPPER(subject_short)=UPPER(courseSubject)))
+        -- If a range and level is provided:
+        AND ((rel IS NULL AND courseLevel IS NULL) OR (
+				UPPER(rel) NOT IN ('GT','LT','EQ')
+				-- if rel = gt return all classes with course level Greather Than the level
+				OR (UPPER(rel)='GT' AND Courses.course_level > courseLevel)
+				-- if rel = lt return all classes with course level Less Than the level
+				OR (UPPER(rel)='LT' AND Courses.course_level < courseLevel)
+                -- if rel = eq return all classes with course level EQual to the level
+                OR (UPPER(rel)='EQ' AND Courses.course_level = courseLevel)
+			))
+		-- If opened = TRUE return all opened classes. Include closed classesin the return otherwise
+		AND (isOpened IS NULL OR isOpened=FALSE OR Classes.isopened=TRUE);
+END; $$
 DELIMITER ;
 
 DELIMITER $$
 CREATE PROCEDURE `FIND_CLASS_BY_ID` (IN classId int)
 BEGIN
-	SELECT K.class_no, CONCAT(S.subj_abv,' ',C.course_level) AS course_code, C.course_name, K.instr_name, 
-	CONCAT(Z.sem_name,' ',YEAR(Z.start_date)) AS semester, K.start_time, K.end_time, K.room, K.capacity, K.num_enrolled, K.`mode`, K.opened
-	FROM Classes K
-	JOIN Courses C on C.course_no=K.Course_no
-	JOIN Subjects S on S.subj_no=C.subj_no
-	JOIN Semesters Z on Z.sem_no=K.sem_no
-	WHERE K.class_no = classId;
-END; $$
-DELIMITER ;
-
-DELIMITER $$
-CREATE PROCEDURE `FIND_COURSE_BY_ID` (IN courseId int)
-BEGIN
-	SELECT C.*, S.subj_abv, COUNT(P.prereq_no) AS 'numPrereq', COUNT(K.conf_no) AS 'numConflicting'
-	FROM Courses C
-	JOIN Subjects S ON S.subj_no=C.subj_no
-	LEFT JOIN Prerequisites P ON C.course_no=P.course_no
-	LEFT JOIN ConflictingCourses K ON C.course_no=K.course_no
-	WHERE C.course_no=courseId
-	GROUP BY C.course_no;
-END; $$
-DELIMITER ;
-
-DELIMITER $$
-CREATE PROCEDURE `FIND_COURSE_FROM_CLASS` (IN classId int)
-BEGIN
-	CALL FIND_COURSE_BY_ID((SELECT course_no FROM Classes WHERE class_no=classId));
+	SELECT Classes.id, Classes.course_id, Courses.course_name, CONCAT(Subjects.subject_short,' ',Courses.course_level) AS course_code,
+		CONCAT(Instructors.first_name,' ',Instructors.last_name) AS instructor_name,
+        CONCAT(Semesters.semester,' ',YEAR(Semesters.start_date)) AS semester, Semesters.start_date, Semesters.end_date,
+        Classes.start_time, Classes.end_time, Classes.room, Classes.capacity, Classes.num_enrolled, Classes.class_mode, Classes.isopened
+	FROM Classes
+	JOIN Courses ON Courses.id = Classes.Course_id
+	JOIN Subjects ON Subjects.id = Courses.subject_id
+	JOIN Semesters ON Semesters.id = Classes.semester_id
+    JOIN Instructors ON Instructors.id = Classes.instructor_id
+	WHERE Classes.id = classId;
 END; $$
 DELIMITER ;

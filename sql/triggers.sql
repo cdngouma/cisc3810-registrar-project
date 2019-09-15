@@ -1,6 +1,6 @@
 /* PREREQUISITS */
 DELIMITER $$
-CREATE TRIGGER `ins_prereq` BEFORE INSERT ON `Prerequisits`
+CREATE TRIGGER `ins_prereq` BEFORE INSERT ON `Prerequisites`
 FOR EACH ROW
 BEGIN
 	IF
@@ -9,31 +9,31 @@ BEGIN
 		/*	return 0 if constraint is violated. return 1 otherwise
 		**/
 		(SELECT 1 FROM Courses C1, Courses C2
-		WHERE C1.course_no=NEW.course_no AND C2.course_no=NEW.sec_course_no
-		AND C1.subj_no=C2.subj_no && C2.course_level > C1.course_level) = 1 OR
-		(SELECT 1 FROM Prerequisits WHERE course_no=NEW.sec_course_no AND sec_course_no=NEW.course_no) = 1 THEN
-		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Ambiguous pre-requisit relationship: for columns \'course_no\' and \'sec_course_no\'';
+		WHERE C1.course_id = NEW.course_id AND C2.course_id = NEW.prereq_id
+		AND C1.subject_id = C2.subject_id && C2.course_level > C1.course_level) = 1 OR
+		(SELECT 1 FROM Prerequisites WHERE course_id = NEW.prereq_id AND prereq_id = NEW.course_id) = 1 THEN
+		SIGNAL SQLSTATE '45001' SET MESSAGE_TEXT = 'Ambiguous prerequisite relationship: for columns \'course_id\' and \'prereq_id\'';
 	END IF;
 END; $$
 DELIMITER ;
 
 DELIMITER $$
-CREATE TRIGGER `upd_prereq` BEFORE UPDATE ON `Prerequisits`
+CREATE TRIGGER `upd_prereq` BEFORE UPDATE ON `Prerequisites`
 FOR EACH ROW
 BEGIN
-	/* prevent user to update column 'course_no' */
-	IF NEW.course_no IS NOT NULL THEN
-		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Column cannot be updated: for column \'course_no\'';
+	/* prevent user to update column 'course_id' */
+	IF NEW.course_id IS NOT NULL THEN
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Column \'course_id\' cannot be updated';
 	ELSEIF
 		/**	check that inserted course level is larger than inserted prerequisit [course] level if both have the same subject
 		/*	and check that inserted course is not a prerequisit of inserted prerequisit
 		/*	return 0 if constraint is violated. return 1 otherwise
 		**/
 		(SELECT 1 FROM Courses C1, Courses C2
-		WHERE C1.course_no=OLD.course_no AND C2.course_no=NEW.sec_course_no
-		AND C1.subj_no=C2.subj_no && C2.course_level > C1.course_level) = 1 OR
-		(SELECT 1 FROM Prerequisits WHERE course_no=NEW.sec_course_no AND sec_course_no=OLD.course_no) = 1 THEN
-		SIGNAL SQLSTATE '45001' SET MESSAGE_TEXT = 'Ambiguous pre-requisit relationship: for columns \'course_no\' and \'sec_course_no\'';
+		WHERE C1.course_id = OLD.course_id AND C2.course_id = NEW.prereq_id
+		AND C1.subject_id = C2.subject_id && C2.course_level > C1.course_level) = 1 OR
+		(SELECT 1 FROM Prerequisites WHERE course_id = NEW.prereq_id AND prereq_id = OLD.course_id) = 1 THEN
+		SIGNAL SQLSTATE '45001' SET MESSAGE_TEXT = 'Ambiguous prerequisite relationship: for columns \'course_id\' and \'prereq_id\'';
 	END IF;
 END; $$
 DELIMITER ;
