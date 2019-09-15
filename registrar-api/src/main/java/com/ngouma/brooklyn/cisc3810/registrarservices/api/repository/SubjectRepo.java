@@ -7,6 +7,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityNotFoundException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 @Repository
@@ -14,61 +16,24 @@ public class SubjectRepo {
     @Autowired
     private JdbcTemplate jdbc;
 
-    public Subject save(Subject s) {
-        try {
-            return jdbc.queryForObject("CALL EDIT_SUBJECTS(?,?,?)", new Object[]{s.getId(), s.getName(), s.getNameShort()},
-                    (rs, numRow) ->
-                            new Subject(
-                                    rs.getInt("subj_no"),
-                                    rs.getString("subj_name"),
-                                    rs.getString("subj_abv")
-                            )
-            );
-        }catch (EmptyResultDataAccessException ex) {
-            throw new EntityNotFoundException();
-        }
-    }
-
-    public Subject update(Integer id, Subject s) {
-        try {
-            return jdbc.queryForObject("CALL EDIT_SUBJECTS(?,?,?)", new Object[]{id, s.getName(), s.getNameShort()},
-                    (rs, numRow) ->
-                            new Subject(
-                                    rs.getInt("subj_no"),
-                                    rs.getString("subj_name"),
-                                    rs.getString("subj_abv")
-                            )
-            );
-        }catch (EmptyResultDataAccessException ex) {
-            throw new EntityNotFoundException();
-        }
-    }
-
     public List<Subject> findAll() {
-        return jdbc.query("SELECT * FROM Subjects", (rs, rowNum) ->
-                new Subject(
-                        rs.getInt("subj_no"),
-                        rs.getString("subj_name"),
-                        rs.getString("subj_abv")
-                )
-        );
+        return jdbc.query("SELECT id, subject_name, subject_short FROM Subjects", this::constructNewSubject);
     }
 
     public Subject findById(Integer subjectNo) {
         try {
-            return jdbc.queryForObject("SELECT * FROM Subjects WHERE subj_no = ?", new Object[]{subjectNo}, (rs, numRow) ->
-                    new Subject(
-                            rs.getInt("subj_no"),
-                            rs.getString("subj_name"),
-                            rs.getString("subj_abv")
-                    )
-            );
+            return jdbc.queryForObject("SELECT id, subject_name, subject_short FROM Subjects WHERE id = ?", new Object[]{subjectNo}, this::constructNewSubject);
         } catch (EmptyResultDataAccessException ex) {
             throw new EntityNotFoundException();
         }
     }
 
-    public boolean deleteById(Integer subjectNo) {
-        return jdbc.update("DELETE FROM Subjects WHERE subj_no=?", subjectNo) > 0;
+    private Subject constructNewSubject(ResultSet rs, int numRow) throws SQLException {
+        return new Subject(
+                rs.getInt("id"),
+                rs.getString("subject_name"),
+                rs.getString("subject_short")
+
+        );
     }
 }

@@ -19,11 +19,8 @@ public class StudentController {
     @GetMapping(path = "/students")
     public ResponseEntity<?> getAllStudents(){
         List<Student> students = studentRepo.findAll();
-        if(students.size() > 0){
-            return new ResponseEntity<>(students, HttpStatus.OK);
-        }else{
-            return new ResponseEntity<>("No students available", HttpStatus.OK);
-        }
+        if(students.size() > 0) return new ResponseEntity<>(students, HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @GetMapping(path = "/students/{studentId}")

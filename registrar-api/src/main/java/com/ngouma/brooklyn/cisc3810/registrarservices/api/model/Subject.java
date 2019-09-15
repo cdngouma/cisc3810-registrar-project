@@ -6,14 +6,14 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public class Subject {
     private Integer id;
     private String name;
-    private String nameShort;
+    private String shortName;
 
     public Subject(){}
 
-    public Subject(Integer id, String name, String nameShort) {
+    public Subject(Integer id, String name, String shortName) {
         this.id = id;
         this.name = name;
-        this.nameShort = nameShort;
+        this.shortName = shortName;
     }
 
     public Integer getId() {
@@ -33,10 +33,10 @@ public class Subject {
     }
 
     public String getNameShort() {
-        return nameShort;
+        return shortName;
     }
 
     public void setNameShort(String nameShort) {
-        this.nameShort = nameShort != null ? nameShort : this.nameShort;
+        this.shortName = nameShort != null ? nameShort : this.shortName;
     }
 }

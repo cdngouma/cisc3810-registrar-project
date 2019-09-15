@@ -1,9 +1,11 @@
 package com.ngouma.brooklyn.cisc3810.registrarservices.api.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Semester {
     private Integer id;
     private String semester;

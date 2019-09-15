@@ -3,56 +3,47 @@ package com.ngouma.brooklyn.cisc3810.registrarservices.api.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.sql.Time;
+import java.util.Date;
+import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ClassEntity {
+public class Class {
     private Integer id;
-    private Integer courseId;
-    private String courseCode;
     private String courseName;
+    private String courseCode;
     private String instructor;
-
-    private Integer semesterId;
     private String semester;
+    private Date startDate;
+    private Date endDate;
+    private List<Byte> meetingDays;
     private Time startTime;
     private Time endTime;
     private String mode;
     private String room;
     private short capacity;
     private short numEnrolledStudents;
-    private boolean opened;
+    private boolean isOpened;
 
-    public ClassEntity(){ }
+    public Class(){ }
 
-    public ClassEntity(Integer id, Integer courseId, String instructor, Integer semesterId, Time startTime, Time endTime, String mode,
-                       String room, short capacity, short numEnrolledStudents, boolean opened) {
+    public Class(Integer id, String courseName, String courseCode, String instructor, String semester,
+                 Date startDate, Date endDate, List<Byte> meetingDays, Time startTime, Time endTime,
+                 String mode, String room, short capacity, short numEnrolledStudents, boolean isOpened) {
         this.id = id;
-        this.courseId = courseId;
-        this.instructor = instructor;
-        this.semesterId = semesterId;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.mode = mode;
-        this.room = room;
-        this.capacity = capacity;
-        this.numEnrolledStudents = numEnrolledStudents;
-        this.opened = opened;
-    }
-
-    public ClassEntity(Integer id, String courseCode, String courseName, String instructor, String semester, Time startTime, Time endTime,
-                       String mode, String room, short capacity, short numEnrolledStudents, boolean opened) {
-        this.id = id;
-        this.courseCode = courseCode;
         this.courseName = courseName;
+        this.courseCode = courseCode;
         this.instructor = instructor;
         this.semester = semester;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.meetingDays = meetingDays;
         this.startTime = startTime;
         this.endTime = endTime;
         this.mode = mode;
         this.room = room;
         this.capacity = capacity;
         this.numEnrolledStudents = numEnrolledStudents;
-        this.opened = opened;
+        this.isOpened = isOpened;
     }
 
     public Integer getId() {
@@ -63,12 +54,12 @@ public class ClassEntity {
         this.id = id;
     }
 
-    public Integer getCourseId() {
-        return courseId;
+    public String getCourseName() {
+        return courseName;
     }
 
-    public void setCourseId(Integer courseId) {
-        this.courseId = courseId;
+    public void setCourseName(String courseName) {
+        this.courseName = courseName;
     }
 
     public String getCourseCode() {
@@ -79,14 +70,6 @@ public class ClassEntity {
         this.courseCode = courseCode;
     }
 
-    public String getCourseName() {
-        return courseName;
-    }
-
-    public void setCourseName(String courseName) {
-        this.courseName = courseName;
-    }
-
     public String getInstructor() {
         return instructor;
     }
@@ -95,20 +78,36 @@ public class ClassEntity {
         this.instructor = instructor;
     }
 
-    public Integer getSemesterId() {
-        return semesterId;
-    }
-
-    public void setSemesterId(Integer semesterId) {
-        this.semesterId = semesterId;
-    }
-
     public String getSemester() {
         return semester;
     }
 
     public void setSemester(String semester) {
         this.semester = semester;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
+    public List<Byte> getMeetingDays() {
+        return meetingDays;
+    }
+
+    public void setMeetingDays(List<Byte> meetingDays) {
+        this.meetingDays = meetingDays;
     }
 
     public Time getStartTime() {
@@ -143,7 +142,7 @@ public class ClassEntity {
         this.room = room;
     }
 
-    public int getCapacity() {
+    public short getCapacity() {
         return capacity;
     }
 
@@ -151,7 +150,7 @@ public class ClassEntity {
         this.capacity = capacity;
     }
 
-    public int getNumEnrolledStudents() {
+    public short getNumEnrolledStudents() {
         return numEnrolledStudents;
     }
 
@@ -160,10 +159,10 @@ public class ClassEntity {
     }
 
     public boolean isOpened() {
-        return opened;
+        return isOpened;
     }
 
     public void setOpened(boolean opened) {
-        this.opened = opened;
+        isOpened = opened;
     }
 }

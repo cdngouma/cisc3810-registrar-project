@@ -1,49 +1,36 @@
 package com.ngouma.brooklyn.cisc3810.registrarservices.api.controller;
 
-import com.ngouma.brooklyn.cisc3810.registrarservices.api.model.ClassEntity;
+import com.ngouma.brooklyn.cisc3810.registrarservices.api.model.Class;
 import com.ngouma.brooklyn.cisc3810.registrarservices.api.repository.ClassRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @RestController
-@RequestMapping(path = "/api/v1")
+@RequestMapping(path = "/api")
 public class ClassController {
     @Autowired
     private ClassRepo classRepo;
 
     @GetMapping("/semesters/{semId}/classes")
-    public List<ClassEntity> getAllClasses(@PathVariable(value = "semId") Integer semId,
-                                           @RequestParam(value = "subject", required = false) String subj,
-                                           @RequestParam(value = "r", required = false) String range,
-                                           @RequestParam(value = "level", required = false) Integer level,
+    public ResponseEntity<?> getAllClasses(@PathVariable(value = "semId") Integer semesterId,
+                                           @RequestParam(value = "subject", required = false) String subject,
+                                           @RequestParam(value = "level", required = false) String levelRange,
                                            @RequestParam(value = "opened", required = false) boolean opened){
-        return classRepo.findAll(semId, subj, range, level, opened);
+        if(levelRange != null && !Pattern.matches("^(gt|lt|eq|GT|LT|EQ):([0-9]{4})$", levelRange))
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        List<Class> classes = classRepo.findAll(semesterId, subject, levelRange, opened);
+        if(classes.size() < 1) return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(classes, HttpStatus.OK);
     }
 
     @GetMapping("/classes/{id}")
-    public ClassEntity getClass(@PathVariable(value = "id") Integer classId){
-        return classRepo.findById(classId);
-    }
-
-    @PostMapping("/semesters/{semId}/classes")
-    public ClassEntity createClass(@PathVariable(value = "semId") Integer semId, @Valid @RequestBody ClassEntity classEntity){
-        return classRepo.save(semId, classEntity);
-    }
-
-    @PutMapping("/classes/{id}")
-    public ClassEntity updateClassInfo(@PathVariable(value = "id") Integer classId, @RequestBody ClassEntity details){
-        return classRepo.update(classId, details);
-    }
-
-    @DeleteMapping("/classes/{id}")
-    public ResponseEntity<?> updateClassInfo(@PathVariable(value = "id") Integer classId){
-        if(classRepo.delete(classId))
-            return new ResponseEntity<>(HttpStatus.OK);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    public ResponseEntity<?> getClass(@PathVariable(value = "id") Integer classId){
+        return new ResponseEntity<>(classRepo.findById(classId), HttpStatus.OK);
     }
 }

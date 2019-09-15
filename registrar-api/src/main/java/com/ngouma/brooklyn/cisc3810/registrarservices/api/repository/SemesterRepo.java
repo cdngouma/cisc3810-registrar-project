@@ -7,6 +7,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityNotFoundException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 @Repository
@@ -14,78 +16,29 @@ public class SemesterRepo {
     @Autowired
     private JdbcTemplate jdbc;
 
-    public Semester save(Semester s) {
-        try {
-            return jdbc.queryForObject("CALL EDIT_SEMESTERS(?,?,?,?)", new Object[]{s.getId(), s.getSemester(), s.getStartDate(), s.getEndDate()},
-                    (rs, numRow) -> new Semester(
-                            rs.getInt("sem_no"),
-                            rs.getString("sem_name"),
-                            rs.getDate("start_date"),
-                            rs.getDate("end_date")
-                    ));
-        } catch (EmptyResultDataAccessException ex) {
-            throw new EntityNotFoundException();
-        }
-    }
-
-    public Semester update(Integer semId, Semester semester) {
-        try {
-            return jdbc.queryForObject("CALL EDIT_SEMESTERS(?,?,?,?)", new Object[]{semId, semester.getSemester(), semester.getStartDate(), semester.getEndDate()},
-                    (rs, numRow) -> new Semester(
-                            rs.getInt("sem_no"),
-                            rs.getString("sem_name"),
-                            rs.getDate("start_date"),
-                            rs.getDate("end_date")
-                    ));
-        } catch (EmptyResultDataAccessException ex) {
-            throw new EntityNotFoundException();
-        }
-    }
-
     /**
-     * @return a list of all semesters
+     * @return if current == true: a list of all semester available for registration
+     *          else return a list of all semesters
      */
-    public List<Semester> findAll() {
-        return jdbc.query("SELECT * FROM Semesters", (rs, numRow) ->
-                new Semester(
-                        rs.getInt("sem_no"),
-                        rs.getString("sem_name"),
-                        rs.getDate("start_date"),
-                        rs.getDate("end_date")
-                )
-        );
+    public List<Semester> findAll(boolean current) {
+        if(current) return jdbc.query("SELECT id, semester, start_date, end_date FROM Semesters WHERE start_date >= CURDATE()", this::constructNewSubject);
+        return jdbc.query("SELECT * FROM Semesters", this::constructNewSubject);
     }
 
-    /**
-     * @return a list of all current semester available during enrollment period (start date > now)
-     */
-    public List<Semester> findAllCurrent() {
-        return jdbc.query("SELECT * FROM Semesters WHERE start_date >= CURDATE()", (rs, numRow) ->
-                new Semester(
-                        rs.getInt("sem_no"),
-                        rs.getString("sem_name"),
-                        rs.getDate("start_date"),
-                        rs.getDate("end_date")
-                )
-        );
-    }
-
-    public Semester findById(Long semId) {
+    public Semester findById(Integer semesterId) {
         try {
-            return jdbc.queryForObject("SELECT * FROM Semesters WHERE sem_no=?", new Object[]{semId}, (rs, numRow) ->
-                    new Semester(
-                            rs.getInt("sem_no"),
-                            rs.getString("sem_name"),
-                            rs.getDate("start_date"),
-                            rs.getDate("end_date")
-                    )
-            );
+            return jdbc.queryForObject("SELECT id, semester, start_date, end_date FROM Semesters WHERE id=?", new Object[]{semesterId}, this::constructNewSubject);
         } catch (EmptyResultDataAccessException ex) {
             throw new EntityNotFoundException();
         }
     }
 
-    public boolean deleteById(Long semId) {
-        return jdbc.update("DELETE FROM Semesters WHERE sem_no=?", semId) > 0;
+    private Semester constructNewSubject(ResultSet rs, int numRow) throws SQLException {
+        return new Semester(
+                rs.getInt("id"),
+                rs.getString("semester"),
+                rs.getDate("start_date"),
+                rs.getDate("end_date")
+        );
     }
 }

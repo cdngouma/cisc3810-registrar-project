@@ -1,6 +1,5 @@
 package com.ngouma.brooklyn.cisc3810.registrarservices.api.controller;
 
-import com.ngouma.brooklyn.cisc3810.registrarservices.api.model.Course;
 import com.ngouma.brooklyn.cisc3810.registrarservices.api.model.Subject;
 import com.ngouma.brooklyn.cisc3810.registrarservices.api.repository.CourseRepo;
 import com.ngouma.brooklyn.cisc3810.registrarservices.api.repository.SubjectRepo;
@@ -9,7 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -21,29 +19,15 @@ public class SubjectController {
     private CourseRepo courseRepo;
 
     @GetMapping(path = "/subjects")
-    public List<Subject> getAllSubjects() {
-        return subjectRepo.findAll();
+    public ResponseEntity<?> getAllSubjects() {
+        List<Subject> subjects = subjectRepo.findAll();
+        if(subjects.size() < 1) return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(subjects, HttpStatus.OK);
     }
 
     @GetMapping(path = "/subjects/{id}")
-    public Subject getSubject(@PathVariable(value = "id") Integer subjId) {
-        return subjectRepo.findById(subjId);
-    }
-
-    @PostMapping(path = "/subjects")
-    public Subject createSubject(@Valid @RequestBody Subject subject) {
-        return subjectRepo.save(subject);
-    }
-
-    @PutMapping(path = "/subjects/{id}")
-    public Subject updateSubject(@PathVariable(value = "id") Integer subjId, @RequestBody Subject details) {
-        return subjectRepo.update(subjId, details);
-    }
-
-    @DeleteMapping(path = "/subjects/{id}")
-    public ResponseEntity<?> deleteSubject(@PathVariable(value = "id") Integer subjId) {
-        if(subjectRepo.deleteById(subjId))
-            return new ResponseEntity<>(HttpStatus.OK);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    public ResponseEntity<?> getSubject(@PathVariable(value = "id") Integer subjId) {
+        Subject subject = subjectRepo.findById(subjId);
+        return new ResponseEntity<>(subject, HttpStatus.OK);
     }
 }
