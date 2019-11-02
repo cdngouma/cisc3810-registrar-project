@@ -8,15 +8,15 @@ import java.util.Date;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Semester {
     private Integer id;
-    private String semester;
+    private String name;
     @DateTimeFormat
     private Date startDate;
     @DateTimeFormat
     private Date endDate;
 
-    public Semester(Integer id, String semester, Date startDate, Date endDate) {
+    public Semester(Integer id, String name, Date startDate, Date endDate) {
         this.id = id;
-        this.semester = semester;
+        this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
     }
@@ -29,12 +29,12 @@ public class Semester {
         this.id = id;
     }
 
-    public String getSemester() {
-        return semester;
+    public String getName() {
+        return name;
     }
 
-    public void setSemester(String semester) {
-        this.semester = semester;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Date getStartDate() {

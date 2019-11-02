@@ -21,4 +21,6 @@ public class Student {
     public Student(){ }
 
 
+    public Student(int id, String email_address, String first_name, String last_name, String gender, java.sql.Date dob, String degree, String major, String division, double gpa) {
+    }
 }

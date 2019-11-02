@@ -12,17 +12,19 @@ import java.sql.SQLException;
 import java.util.List;
 
 @Repository
-public class SubjectRepo {
+public class SubjectRepository {
     @Autowired
-    private JdbcTemplate jdbc;
+    private JdbcTemplate jdbcTemplate;
 
     public List<Subject> findAll() {
-        return jdbc.query("SELECT id, subject_name, subject_short FROM Subjects", this::constructNewSubject);
+        final String QUERY = "SELECT id, subject_name, subject_name_short FROM Subjects";
+        return jdbcTemplate.query(QUERY, this::constructNewSubject);
     }
 
-    public Subject findById(Integer subjectNo) {
+    public Subject findById(Integer subjectId) {
         try {
-            return jdbc.queryForObject("SELECT id, subject_name, subject_short FROM Subjects WHERE id = ?", new Object[]{subjectNo}, this::constructNewSubject);
+            final String QUERY = "SELECT id, subject_name, subject_name_short FROM Subjects WHERE id = ?";
+            return jdbcTemplate.queryForObject(QUERY, new Object[]{subjectId}, this::constructNewSubject);
         } catch (EmptyResultDataAccessException ex) {
             throw new EntityNotFoundException();
         }
@@ -30,10 +32,8 @@ public class SubjectRepo {
 
     private Subject constructNewSubject(ResultSet rs, int numRow) throws SQLException {
         return new Subject(
-                rs.getInt("id"),
                 rs.getString("subject_name"),
-                rs.getString("subject_short")
-
+                rs.getString("subject_name_short")
         );
     }
 }
