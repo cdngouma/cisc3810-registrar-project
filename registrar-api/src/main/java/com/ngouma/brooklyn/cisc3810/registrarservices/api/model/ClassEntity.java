@@ -7,43 +7,37 @@ import java.util.Date;
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Class {
+public class ClassEntity {
     private Integer id;
-    private String courseName;
-    private String courseCode;
+    private Course course;
     private String instructor;
     private String semester;
     private Date startDate;
     private Date endDate;
-    private List<Byte> meetingDays;
+    private List<Byte> days;
     private Time startTime;
     private Time endTime;
     private String mode;
     private String room;
     private short capacity;
     private short numEnrolledStudents;
-    private boolean isOpened;
+    private String status;
 
-    public Class(){ }
-
-    public Class(Integer id, String courseName, String courseCode, String instructor, String semester,
-                 Date startDate, Date endDate, List<Byte> meetingDays, Time startTime, Time endTime,
-                 String mode, String room, short capacity, short numEnrolledStudents, boolean isOpened) {
+    public ClassEntity(Integer id, Course course, String instructor, String semester, Date startDate, Date endDate, Time startTime,
+                       Time endTime, String mode, String room, short capacity, short numEnrolledStudents, String status) {
         this.id = id;
-        this.courseName = courseName;
-        this.courseCode = courseCode;
+        this.course = course;
         this.instructor = instructor;
         this.semester = semester;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.meetingDays = meetingDays;
         this.startTime = startTime;
         this.endTime = endTime;
         this.mode = mode;
         this.room = room;
         this.capacity = capacity;
         this.numEnrolledStudents = numEnrolledStudents;
-        this.isOpened = isOpened;
+        this.status = status;
     }
 
     public Integer getId() {
@@ -54,20 +48,12 @@ public class Class {
         this.id = id;
     }
 
-    public String getCourseName() {
-        return courseName;
+    public Course getCourse() {
+        return course;
     }
 
-    public void setCourseName(String courseName) {
-        this.courseName = courseName;
-    }
-
-    public String getCourseCode() {
-        return courseCode;
-    }
-
-    public void setCourseCode(String courseCode) {
-        this.courseCode = courseCode;
+    public void setCourse(Course course) {
+        this.course = course;
     }
 
     public String getInstructor() {
@@ -102,12 +88,12 @@ public class Class {
         this.endDate = endDate;
     }
 
-    public List<Byte> getMeetingDays() {
-        return meetingDays;
+    public List<Byte> getDays() {
+        return days;
     }
 
-    public void setMeetingDays(List<Byte> meetingDays) {
-        this.meetingDays = meetingDays;
+    public void setDays(List<Byte> days) {
+        this.days = days;
     }
 
     public Time getStartTime() {
@@ -158,11 +144,11 @@ public class Class {
         this.numEnrolledStudents = numEnrolledStudents;
     }
 
-    public boolean isOpened() {
-        return isOpened;
+    public String getStatus() {
+        return status;
     }
 
-    public void setOpened(boolean opened) {
-        isOpened = opened;
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

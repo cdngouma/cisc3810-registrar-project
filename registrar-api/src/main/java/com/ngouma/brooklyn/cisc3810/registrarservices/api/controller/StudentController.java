@@ -28,23 +28,4 @@ public class StudentController {
         Student student = studentRepo.findById(id);
         return new ResponseEntity<>(student, HttpStatus.OK);
     }
-
-    @PostMapping(path = "/students")
-    public ResponseEntity<?> createStudent(@Valid @RequestBody Student student){
-        Student newStudent = studentRepo.save(student);
-        return new ResponseEntity<>(newStudent, HttpStatus.OK);
-    }
-
-    @PutMapping(path = "/students/{studentId}")
-    public ResponseEntity<?> updateStudent(@PathVariable(value = "studentId") Integer id, @RequestBody Student details){
-        Student student = studentRepo.update(id, details);
-        return new ResponseEntity<>(student, HttpStatus.OK);
-    }
-
-    @DeleteMapping(path = "/students/{studentId}")
-    public ResponseEntity<?> deleteStudent(@PathVariable(value = "studentId") Integer id){
-        if(studentRepo.delete(id))
-            return new ResponseEntity<>("Student removed", HttpStatus.OK);
-        return new ResponseEntity<>("No student to remove", HttpStatus.OK);
-    }
 }

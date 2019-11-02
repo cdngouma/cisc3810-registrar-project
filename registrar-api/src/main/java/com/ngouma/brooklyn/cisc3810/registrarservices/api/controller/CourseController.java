@@ -1,8 +1,8 @@
 package com.ngouma.brooklyn.cisc3810.registrarservices.api.controller;
 
-import com.ngouma.brooklyn.cisc3810.registrarservices.api.model.Subject;
-import com.ngouma.brooklyn.cisc3810.registrarservices.api.model.course.Course;
-import com.ngouma.brooklyn.cisc3810.registrarservices.api.repository.CourseRepo;
+import com.ngouma.brooklyn.cisc3810.registrarservices.api.helper.Response;
+import com.ngouma.brooklyn.cisc3810.registrarservices.api.model.Course;
+import com.ngouma.brooklyn.cisc3810.registrarservices.api.repository.CourseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,21 +11,23 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "/api")
+@RequestMapping(path = "/api/courses")
 public class CourseController {
     @Autowired
-    private CourseRepo courseRepo;
+    private CourseRepository courseRepository;
 
-    @GetMapping(path = "/subjects/{id}/courses")
-    public ResponseEntity<?> getAllCoursesBySubject(@PathVariable(value = "id") Integer subjectId) {
-        List<Course> subjects =  courseRepo.findAllBySubjectId(subjectId);
-        if(subjects.size() < 1) return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        return new ResponseEntity<>(subjects, HttpStatus.OK);
+    @GetMapping
+    public ResponseEntity<?> getAllCoursesBySubject(@RequestParam(value = "subject") String subject) {
+        List<Course> subjects =  courseRepository.findAllBySubject(subject);
+        if(subjects.size() > 0) {
+            return new ResponseEntity<>(new Response(subjects), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping(path = "/courses/{id}")
-    public ResponseEntity<?> getCourse(@PathVariable(value = "id") Integer courseNo){
-        Course course = courseRepo.findCourseById(courseNo);
+    @GetMapping(path = "/{id}")
+    public ResponseEntity<?> getCourse(@PathVariable(value = "id") Integer id){
+        Course course = courseRepository.findCourseById(id);
         return new ResponseEntity<>(course, HttpStatus.OK);
     }
 }

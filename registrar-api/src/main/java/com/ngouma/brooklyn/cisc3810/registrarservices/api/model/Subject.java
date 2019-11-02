@@ -10,8 +10,7 @@ public class Subject {
 
     public Subject(){}
 
-    public Subject(Integer id, String name, String shortName) {
-        this.id = id;
+    public Subject(String name, String shortName) {
         this.name = name;
         this.shortName = shortName;
     }

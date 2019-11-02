@@ -12,22 +12,22 @@ import java.sql.SQLException;
 import java.util.List;
 
 @Repository
-public class SemesterRepo {
+public class SemesterRepository {
     @Autowired
-    private JdbcTemplate jdbc;
+    private JdbcTemplate jdbcTemplate;
 
-    /**
-     * @return if current == true: a list of all semester available for registration
-     *          else return a list of all semesters
-     */
     public List<Semester> findAll(boolean current) {
-        if(current) return jdbc.query("SELECT id, semester, start_date, end_date FROM Semesters WHERE start_date >= CURDATE()", this::constructNewSubject);
-        return jdbc.query("SELECT * FROM Semesters", this::constructNewSubject);
+        final String QUERY = "SELECT id, sem_name, start_date, end_date FROM semesters WHERE start_date >= CURDATE()";
+        if(current) {
+            return jdbcTemplate.query(QUERY, this::constructNewSubject);
+        }
+        return jdbcTemplate.query("SELECT id, sem_name, start_date, end_date FROM Semesters", this::constructNewSubject);
     }
 
     public Semester findById(Integer semesterId) {
         try {
-            return jdbc.queryForObject("SELECT id, semester, start_date, end_date FROM Semesters WHERE id=?", new Object[]{semesterId}, this::constructNewSubject);
+            final String QUERY = "SELECT id, sem_name, start_date, end_date FROM semesters WHERE id = ?";
+            return jdbcTemplate.queryForObject(QUERY, new Object[]{semesterId}, this::constructNewSubject);
         } catch (EmptyResultDataAccessException ex) {
             throw new EntityNotFoundException();
         }
@@ -36,7 +36,7 @@ public class SemesterRepo {
     private Semester constructNewSubject(ResultSet rs, int numRow) throws SQLException {
         return new Semester(
                 rs.getInt("id"),
-                rs.getString("semester"),
+                rs.getString("sem_name"),
                 rs.getDate("start_date"),
                 rs.getDate("end_date")
         );
