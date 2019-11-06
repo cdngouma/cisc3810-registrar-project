@@ -25,7 +25,7 @@ public class ClassController {
         if(levelRange != null && !Pattern.matches("^(gt|lt|eq|GT|LT|EQ):([0-9]{4})$", levelRange)) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        // api/classes?semester=FA19&ubject=CISC&level=gt:3000&opened=true
+
         List<ClassEntity> classes = classRepository.findAll(semester, subject, levelRange, opened);
         if(classes.size() > 0) {
             return new ResponseEntity<>(new Response(classes), HttpStatus.OK);
