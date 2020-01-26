@@ -1,34 +1,37 @@
 package com.ngouma.brooklyn.cisc3810.registrarservices.api.controller;
 
-import com.ngouma.brooklyn.cisc3810.registrarservices.api.helper.Response;
-import com.ngouma.brooklyn.cisc3810.registrarservices.api.model.Semester;
+import com.ngouma.brooklyn.cisc3810.registrarservices.api.exception.NotFoundException;
+import com.ngouma.brooklyn.cisc3810.registrarservices.api.model.AcademicPeriod;
 import com.ngouma.brooklyn.cisc3810.registrarservices.api.repository.SemesterRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
+import javax.websocket.server.PathParam;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @RestController
-@RequestMapping(path = "/api/semesters")
 public class SemesterController {
+    private Logger LOG = Logger.getLogger(getClass().getName());
+
     @Autowired
     private SemesterRepository semesterRepository;
 
-    @GetMapping
-    public ResponseEntity<?> getAllSemesters(@RequestParam(value = "active", required = false) boolean active){
-        List<Semester> semesters = semesterRepository.findAll(active);
-        if(semesters.size() > 0) {
-            return new ResponseEntity<>(new Response(semesters), HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    @GetMapping("/semesters")
+    public List<AcademicPeriod> getAllSemesters(@RequestParam(value = "current", required = false) Boolean active) {
+        if (active != null && active) return semesterRepository.findAllActive();
+        return semesterRepository.findAll();
     }
 
-    @GetMapping(path = "/{id}")
-    public ResponseEntity<?> getSemester(@PathVariable(value = "id") Integer id){
-        System.err.println(id);
-        Semester semester = semesterRepository.findById(id);
-        return new ResponseEntity<>(semester, HttpStatus.OK);
+    @GetMapping("/semesters/{id}")
+    public AcademicPeriod getSemesterById(@PathVariable(value = "id") Integer periodId) throws NotFoundException {
+        AcademicPeriod semester = semesterRepository.findById(periodId)
+                .orElseThrow(() -> new NotFoundException(String.format("Academic period with id '%d'", periodId)));
+        LOG.log(Level.INFO, semester.toString());
+        return semester;
     }
 }
