@@ -1,41 +1,65 @@
 package com.ngouma.brooklyn.cisc3810.registrarservices.api.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.hibernate.validator.constraints.Length;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
+import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import java.util.List;
+
+@Entity
+@Table(name = "subjects")
+@JsonInclude(content = JsonInclude.Include.NON_NULL)
 public class Subject {
-    private Integer id;
-    private String name;
-    private String shortName;
+    @Id
+    @Column(updatable = false, nullable = false)
+    private int id;
 
-    public Subject(){}
+    @NotBlank
+    private String subjectName;
 
-    public Subject(String name, String shortName) {
-        this.name = name;
-        this.shortName = shortName;
+    @NotBlank
+    @Length(min = 4, max = 4)
+    private String subjectCode;
+
+    @OneToMany(mappedBy = "subject")
+    private List<Course> course;
+
+    protected Subject() {}
+
+    public Subject(int id, String subjectName, String subjectCode) {
+        this.id = id;
+        this.subjectName = subjectName;
+        this.subjectCode = subjectCode;
     }
 
-    public Integer getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(int id) {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getSubjectName() {
+        return subjectName;
     }
 
-    public void setName(String name) {
-        this.name = name != null ? name : this.name;
+    public void setSubjectName(String subjectName) {
+        this.subjectName = subjectName;
     }
 
-    public String getNameShort() {
-        return shortName;
+    public String getSubjectCode() {
+        return subjectCode;
     }
 
-    public void setNameShort(String nameShort) {
-        this.shortName = nameShort != null ? nameShort : this.shortName;
+    public void setSubjectCode(String subjectCode) {
+        this.subjectCode = subjectCode;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Subject : {id : %d, subjectName : \"%s\", subjectCode : \"%s\"}",
+                this.id, this.subjectName, this.subjectCode);
     }
 }
