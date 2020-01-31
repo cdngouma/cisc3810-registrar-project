@@ -2,7 +2,9 @@ package com.ngouma.brooklyn.cisc3810.registrarservices.api.model;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.sql.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "academic_periods")
@@ -15,11 +17,14 @@ public class AcademicPeriod {
     @NotBlank
     private Date startDate;
 
-    @NotBlank
+    @NotNull
     private Date endDate;
 
     @NotBlank
     private String semester;
+
+    @OneToMany(mappedBy = "semester")
+    private List<ClassEntity> classes;
 
     protected AcademicPeriod() {}
 

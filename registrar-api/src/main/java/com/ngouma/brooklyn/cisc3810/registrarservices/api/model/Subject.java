@@ -23,7 +23,10 @@ public class Subject {
     private String subjectCode;
 
     @OneToMany(mappedBy = "subject")
-    private List<Course> course;
+    private List<Course> courses;
+
+    @OneToMany(mappedBy = "department")
+    private List<Instructor> instructors;
 
     protected Subject() {}
 

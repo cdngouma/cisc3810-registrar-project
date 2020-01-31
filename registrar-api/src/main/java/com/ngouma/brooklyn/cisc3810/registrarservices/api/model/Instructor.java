@@ -4,6 +4,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import java.util.List;
 
 @Entity
 @Table(name = "instructors")
@@ -24,6 +25,9 @@ public class Instructor {
 
     @NotBlank
     private String lastName;
+
+    @OneToMany(mappedBy = "instructor")
+    private List<ClassEntity> classes;
 
     protected Instructor() {}
 

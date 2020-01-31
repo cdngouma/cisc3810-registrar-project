@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PositiveOrZero;
+import java.util.List;
 
 @Entity
 @Table(name = "courses")
@@ -39,6 +40,9 @@ public class Course {
 
     @Column(name = "course_desc")
     private String courseDesc;
+
+    @OneToMany(mappedBy = "course")
+    private List<ClassEntity> classes;
 
     protected Course() {}
 
