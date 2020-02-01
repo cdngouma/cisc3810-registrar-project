@@ -1,51 +1,77 @@
 package com.ngouma.brooklyn.cisc3810.registrarservices.api.model;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-
+import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PositiveOrZero;
 import java.sql.Time;
-import java.util.Date;
-import java.util.List;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@Entity
+@Table(name = "classes")
 public class ClassEntity {
-    private Integer id;
-    private Course course;
-    private String instructor;
-    private String semester;
-    private Date startDate;
-    private Date endDate;
-    private List<Byte> days;
-    private Time startTime;
-    private Time endTime;
-    private String mode;
-    private String room;
-    private short capacity;
-    private short numEnrolledStudents;
-    private String status;
+    @Id
+    @Column(updatable = false, nullable = false)
+    private int id;
 
-    public ClassEntity(Integer id, Course course, String instructor, String semester, Date startDate, Date endDate, Time startTime,
-                       Time endTime, String mode, String room, short capacity, short numEnrolledStudents, String status) {
+    @ManyToOne
+    @JoinColumn(name = "period_id", referencedColumnName = "id")
+    private AcademicPeriod semester;
+
+    @ManyToOne
+    @JoinColumn(name = "course_id", referencedColumnName = "id")
+    private Course course;
+
+    @ManyToOne
+    @JoinColumn(name = "instructor_id", referencedColumnName = "id")
+    private Instructor instructor;
+
+    @NotNull
+    private Time startTime;
+
+    @NotNull
+    private Time endTime;
+
+    private String room;
+
+    @PositiveOrZero
+    private short roomCapacity;
+
+    @PositiveOrZero
+    private short numEnrolled;
+
+    @NotBlank
+    private String meetingDays;
+
+    protected  ClassEntity() {}
+
+    public ClassEntity(int id, AcademicPeriod semester, Course course, Instructor instructor, Time startTime, Time endTime, String classRoom,
+                       short roomCapacity, short numEnrolled, String meetingDays) {
         this.id = id;
+        this.semester = semester;
         this.course = course;
         this.instructor = instructor;
-        this.semester = semester;
-        this.startDate = startDate;
-        this.endDate = endDate;
         this.startTime = startTime;
         this.endTime = endTime;
-        this.mode = mode;
-        this.room = room;
-        this.capacity = capacity;
-        this.numEnrolledStudents = numEnrolledStudents;
-        this.status = status;
+        this.room = classRoom;
+        this.roomCapacity = roomCapacity;
+        this.numEnrolled = numEnrolled;
+        this.meetingDays = meetingDays;
     }
 
-    public Integer getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(int id) {
         this.id = id;
+    }
+
+    public AcademicPeriod getSemester() {
+        return semester;
+    }
+
+    public void setSemester(AcademicPeriod semester) {
+        this.semester = semester;
     }
 
     public Course getCourse() {
@@ -56,44 +82,12 @@ public class ClassEntity {
         this.course = course;
     }
 
-    public String getInstructor() {
+    public Instructor getInstructor() {
         return instructor;
     }
 
-    public void setInstructor(String instructor) {
+    public void setInstructor(Instructor instructor) {
         this.instructor = instructor;
-    }
-
-    public String getSemester() {
-        return semester;
-    }
-
-    public void setSemester(String semester) {
-        this.semester = semester;
-    }
-
-    public Date getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
-    }
-
-    public Date getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
-    }
-
-    public List<Byte> getDays() {
-        return days;
-    }
-
-    public void setDays(List<Byte> days) {
-        this.days = days;
     }
 
     public Time getStartTime() {
@@ -112,14 +106,6 @@ public class ClassEntity {
         this.endTime = endTime;
     }
 
-    public String getMode() {
-        return mode;
-    }
-
-    public void setMode(String mode) {
-        this.mode = mode;
-    }
-
     public String getRoom() {
         return room;
     }
@@ -128,27 +114,27 @@ public class ClassEntity {
         this.room = room;
     }
 
-    public short getCapacity() {
-        return capacity;
+    public short getRoomCapacity() {
+        return roomCapacity;
     }
 
-    public void setCapacity(short capacity) {
-        this.capacity = capacity;
+    public void setRoomCapacity(short roomCapacity) {
+        this.roomCapacity = roomCapacity;
     }
 
-    public short getNumEnrolledStudents() {
-        return numEnrolledStudents;
+    public short getNumEnrolled() {
+        return numEnrolled;
     }
 
-    public void setNumEnrolledStudents(short numEnrolledStudents) {
-        this.numEnrolledStudents = numEnrolledStudents;
+    public void setNumEnrolled(short numEnrolled) {
+        this.numEnrolled = numEnrolled;
     }
 
-    public String getStatus() {
-        return status;
+    public String getMeetingDays() {
+        return meetingDays;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setMeetingDays(String meetingDays) {
+        this.meetingDays = meetingDays;
     }
 }
