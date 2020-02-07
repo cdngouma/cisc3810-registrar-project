@@ -1,7 +1,7 @@
 package com.ngouma.brooklyn.cisc3810.registrarservices.api.controller;
 
 import com.ngouma.brooklyn.cisc3810.registrarservices.api.exception.NotFoundException;
-import com.ngouma.brooklyn.cisc3810.registrarservices.api.exception.SaveEntityFailedException;
+import com.ngouma.brooklyn.cisc3810.registrarservices.api.exception.FailedCreateEntityException;
 import com.ngouma.brooklyn.cisc3810.registrarservices.api.model.Course;
 import com.ngouma.brooklyn.cisc3810.registrarservices.api.repository.CourseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,7 +76,7 @@ public class CourseController {
 //    }
 //
     @PutMapping("/courses/{courseId}/prereqs")
-    public Course updatePrerequisiteList(@PathVariable(value = "courseId") Integer courseId, @RequestBody List<String> prqsCourseCodeList) throws NotFoundException, SaveEntityFailedException {
+    public Course updatePrerequisiteList(@PathVariable(value = "courseId") Integer courseId, @RequestBody List<String> prqsCourseCodeList) throws NotFoundException, FailedCreateEntityException {
         try {
             Course course = courseRepository.findById(courseId)
                     .orElseThrow(() -> new NotFoundException(String.format("Course with id '%s' was not found", courseId)));
@@ -85,7 +85,7 @@ public class CourseController {
                 if (!Pattern.matches("^([A-Z]{4})-([0-9]{4})$", prqCourseCode)
                         || courseRepository.validateCoursePrerequisite(courseId, prqCourseCode) == null) {
                     System.err.println(courseRepository.validateCoursePrerequisite(courseId, prqCourseCode));
-                    throw new SaveEntityFailedException(String.format
+                    throw new FailedCreateEntityException(String.format
                             ("Course with code [%s] could not be added as prerequisite to course [Id: %s]", prqCourseCode, courseId));
                 }
             }
@@ -94,11 +94,11 @@ public class CourseController {
             course.setPrerequisites(String.join(";", prqsCourseCodeList));
             return courseRepository.save(course);
 
-        } catch(SaveEntityFailedException | NotFoundException e) {
+        } catch(FailedCreateEntityException | NotFoundException e) {
             throw e;
         } catch (Exception e) {
             e.printStackTrace();
-            throw new SaveEntityFailedException(String.format
+            throw new FailedCreateEntityException(String.format
                     ("Failed to add prerequisites [%s] to course with id '%s'", String.join(";", prqsCourseCodeList), courseId));
         }
     }

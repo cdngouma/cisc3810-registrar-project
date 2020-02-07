@@ -13,7 +13,7 @@ import java.util.List;
 public class Subject {
     @Id
     @Column(updatable = false, nullable = false)
-    private int id;
+    private Integer id;
 
     @NotBlank
     private String subjectName;

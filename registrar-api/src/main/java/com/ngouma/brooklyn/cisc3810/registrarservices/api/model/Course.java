@@ -14,7 +14,7 @@ public class Course {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false, nullable = false)
-    private int id;
+    private Integer id;
 
     @NotBlank
     @Column(unique = true)

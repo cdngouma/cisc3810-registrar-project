@@ -2,16 +2,14 @@ package com.ngouma.brooklyn.cisc3810.registrarservices.api.controller;
 
 import com.ngouma.brooklyn.cisc3810.registrarservices.api.exception.ConflictingEntityException;
 import com.ngouma.brooklyn.cisc3810.registrarservices.api.exception.NotFoundException;
-import com.ngouma.brooklyn.cisc3810.registrarservices.api.exception.SaveEntityFailedException;
+import com.ngouma.brooklyn.cisc3810.registrarservices.api.exception.FailedCreateEntityException;
 import com.ngouma.brooklyn.cisc3810.registrarservices.api.model.ClassEntity;
 import com.ngouma.brooklyn.cisc3810.registrarservices.api.repository.ClassRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Logger;
 
 @RestController
@@ -35,7 +33,7 @@ public class ClassController {
     }
 
     @PostMapping("/classes")
-    public ClassEntity createClass(@Valid @RequestBody ClassEntity classInfo) throws ConflictingEntityException, SaveEntityFailedException {
+    public ClassEntity createClass(@Valid @RequestBody ClassEntity classInfo) throws ConflictingEntityException, FailedCreateEntityException {
         String classDays = classInfo.getMeetingDays();
         StringBuilder classDaysRegex = new StringBuilder();
 
@@ -52,7 +50,7 @@ public class ClassController {
         }
 
         return classRepository.findById(classRepository.save(classInfo).getId())
-                .orElseThrow(() -> new SaveEntityFailedException("Failed to create class"));
+                .orElseThrow(() -> new FailedCreateEntityException("Failed to create class"));
         //return null;
     }
 }
