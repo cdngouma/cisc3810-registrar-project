@@ -32,25 +32,24 @@ public class ClassController {
                 .orElseThrow(() -> new NotFoundException(String.format("Class with id '%d' was not found", classId)));
     }
 
-    @PostMapping("/classes")
-    public ClassEntity createClass(@Valid @RequestBody ClassEntity classInfo) throws ConflictingEntityException, FailedCreateEntityException {
-        String classDays = classInfo.getMeetingDays();
-        StringBuilder classDaysRegex = new StringBuilder();
-
-        for (int i = 0; i < classDays.length(); i++) {
-            classDaysRegex.append(classDays.charAt(i));
-            if (i % 2  != 0 && i < classDays.length() - 1) classDaysRegex.append("|");
-        }
-
-        boolean valid = classRepository.findConflictWithClass(classInfo.getSemester().getId(), classInfo.getEndTime(),
-                classInfo.getStartTime(), classDaysRegex.toString(), classInfo.getInstructor().getId(), classInfo.getRoom()) == null;
-
-        if (!valid) {
-            throw new ConflictingEntityException("The class submitted overlap with other classes");
-        }
-
-        return classRepository.findById(classRepository.save(classInfo).getId())
-                .orElseThrow(() -> new FailedCreateEntityException("Failed to create class"));
-        //return null;
-    }
+//    @PostMapping("/classes")
+//    public ClassEntity createClass(@Valid @RequestBody ClassEntity classInfo) throws ConflictingEntityException, FailedCreateEntityException {
+//        String classDays = classInfo.getMeetingDays();
+//        StringBuilder classDaysRegex = new StringBuilder();
+//
+//        for (int i = 0; i < classDays.length(); i++) {
+//            classDaysRegex.append(classDays.charAt(i));
+//            if (i % 2  != 0 && i < classDays.length() - 1) classDaysRegex.append("|");
+//        }
+//
+//        boolean valid = classRepository.findConflictWithClass(classInfo.getSemester().getId(), classInfo.getEndTime(),
+//                classInfo.getStartTime(), classDaysRegex.toString(), classInfo.getInstructor().getId(), classInfo.getRoom()) == null;
+//
+//        if (!valid) {
+//            throw new ConflictingEntityException("The class submitted overlap with other classes");
+//        }
+//
+//        return classRepository.findById(classRepository.save(classInfo).getId())
+//                .orElseThrow(() -> new FailedCreateEntityException("Failed to create class"));
+//    }
 }

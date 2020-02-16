@@ -31,30 +31,28 @@ public class StudentController {
                 .orElseThrow(() -> new NotFoundException(String.format("Student with id '%d' was not found", studentId)));
     }
 
-    @PostMapping("/students")
-    public Student createStudent(@Valid @RequestBody Student studentInfo) throws FailedCreateEntityException {
-        try {
-            Student student = studentRepository.findById(studentRepository.save(studentInfo).getId())
-                    .orElseThrow(() -> new FailedCreateEntityException("Failed to generate new ID"));
-            LOG.log(Level.INFO, String.format("Created new student: %s", student.toString()));
-            return student;
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new FailedCreateEntityException("Failed to create new student");
-        }
-    }
+//    @PostMapping("/students")
+//    public Student createStudent(@Valid @RequestBody Student studentInfo) throws FailedCreateEntityException {
+//        try {
+//            return studentRepository.findById(studentRepository.save(studentInfo).getId())
+//                    .orElseThrow(() -> new FailedCreateEntityException("Failed to generate new ID"));
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            throw new FailedCreateEntityException("Failed to create new student");
+//        }
+//    }
 
-    @PutMapping("/students/{id}")
-    public Student updateStudent(@PathVariable(name = "id") Long studentId, @RequestParam Student studentInfo) throws NotFoundException {
-        Student student = studentRepository.findById(studentId)
-                .orElseThrow(() -> new NotFoundException(String.format("Student with id '%s' was not found", studentId)));
-
-        if (studentInfo.getFirstName() != null) student.setFirstName(studentInfo.getFirstName());
-        if (studentInfo.getLastName() != null) student.setFirstName(studentInfo.getLastName());
-        if (studentInfo.getDateOfBirth() != null) student.setDateOfBirth(studentInfo.getDateOfBirth());
-        if (studentInfo.getGender() != null) student.setGender(studentInfo.getGender());
-        if (studentInfo.getMajor() != null) student.setMajor(studentInfo.getMajor());
-
-        return studentRepository.save(student);
-    }
+//    @PutMapping("/students/{id}")
+//    public Student updateStudent(@PathVariable(name = "id") Long studentId, @RequestParam Student studentInfo) throws NotFoundException {
+//        Student student = studentRepository.findById(studentId)
+//                .orElseThrow(() -> new NotFoundException(String.format("Student with id '%s' was not found", studentId)));
+//
+//        if (studentInfo.getFirstName() != null) student.setFirstName(studentInfo.getFirstName());
+//        if (studentInfo.getLastName() != null) student.setFirstName(studentInfo.getLastName());
+//        if (studentInfo.getDateOfBirth() != null) student.setDateOfBirth(studentInfo.getDateOfBirth());
+//        if (studentInfo.getGender() != null) student.setGender(studentInfo.getGender());
+//        if (studentInfo.getMajor() != null) student.setMajor(studentInfo.getMajor());
+//
+//        return studentRepository.save(student);
+//    }
 }

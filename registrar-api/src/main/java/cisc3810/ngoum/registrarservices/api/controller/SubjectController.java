@@ -21,11 +21,9 @@ public class SubjectController {
         return subjectRepository.findAll();
     }
 
-    @GetMapping("/subjects/{id}")
-    public Subject getSubjectById(@PathVariable(value = "id") Integer subjectId) throws NotFoundException {
-        Subject subject = subjectRepository.findById(subjectId)
-                .orElseThrow(() -> new NotFoundException(String.format("Subject with id : '%d' not found", subjectId)));
-        LOG.log(Level.INFO, subject.toString());
-        return subject;
-    }
+//    @GetMapping("/subjects/{id}")
+//    public Subject getSubjectById(@PathVariable(value = "id") Integer subjectId) throws NotFoundException {
+//        return subjectRepository.findById(subjectId)
+//                .orElseThrow(() -> new NotFoundException(String.format("Subject with id : '%d' not found", subjectId)));
+//    }
 }
