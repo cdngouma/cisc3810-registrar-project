@@ -1,3 +1,5 @@
+<image src="diagram.png>
+
 # REST API
 
 This project is a REST API mirroring the operations performed by a college registrar office as described below.
