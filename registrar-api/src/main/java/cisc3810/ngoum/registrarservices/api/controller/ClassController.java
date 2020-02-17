@@ -42,7 +42,7 @@ public class ClassController {
 //            if (i % 2  != 0 && i < classDays.length() - 1) classDaysRegex.append("|");
 //        }
 //
-//        boolean valid = classRepository.findConflictWithClass(classInfo.getSemester().getId(), classInfo.getEndTime(),
+//        boolean valid = classRepository.findNumConflictClasses(classInfo.getSemester().getId(), classInfo.getEndTime(),
 //                classInfo.getStartTime(), classDaysRegex.toString(), classInfo.getInstructor().getId(), classInfo.getRoom()) == null;
 //
 //        if (!valid) {

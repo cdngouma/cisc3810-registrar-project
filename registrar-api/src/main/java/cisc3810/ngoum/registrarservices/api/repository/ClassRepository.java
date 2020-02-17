@@ -16,5 +16,8 @@ public interface ClassRepository extends JpaRepository <ClassEntity, Integer> {
             "AND REGEXP_LIKE(c.meeting_days, ?4) <> 0\n" +
             // check for conflicting instructor or room
             "AND (?5 = c.instructor_id OR ?6 = c.room);", nativeQuery = true)
-    Long findConflictWithClass(int periodId, Time endTime, Time startTime, String meetingDaysRegex, long instrId, String room);
+    Long findNumConflictClasses(int periodId, Time endTime, Time startTime, String meetingDaysRegex, long instrId, String room);
+
+    @Query(value = "SELECT meeting_days FROM classes WHERE id = ?1", nativeQuery = true)
+    String findMeetingDays(Integer classId);
 }

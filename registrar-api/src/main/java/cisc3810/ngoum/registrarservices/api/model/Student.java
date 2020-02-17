@@ -5,6 +5,7 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "students")
@@ -48,6 +49,14 @@ public class Student {
 
     @Transient
     private short attemptedCredits;
+
+    @Transient
+    @OneToMany(mappedBy = "classEntity")
+    private List<StudentClass> studentClasses;
+
+    @Transient
+    @OneToMany(mappedBy = "student")
+    private List<Student> students;
 
     protected Student() {}
 
@@ -148,6 +157,22 @@ public class Student {
 
     public void setAttemptedCredits(short attemptedCredits) {
         this.attemptedCredits = attemptedCredits;
+    }
+
+    public List<StudentClass> getStudentClasses() {
+        return studentClasses;
+    }
+
+    public void setStudentClasses(List<StudentClass> studentClasses) {
+        this.studentClasses = studentClasses;
+    }
+
+    public List<Student> getStudents() {
+        return students;
+    }
+
+    public void setStudents(List<Student> students) {
+        this.students = students;
     }
 
     @Override

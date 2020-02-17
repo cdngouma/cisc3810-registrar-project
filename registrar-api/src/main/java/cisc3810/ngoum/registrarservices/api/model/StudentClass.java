@@ -7,33 +7,29 @@ import javax.validation.constraints.PositiveOrZero;
 
 @Entity
 @Table(name ="student_classes")
-public class StudentClasses {
-    enum CompletionStatus {
-        COMPLETED,
-        ENROLLED,
-        FORGIVEN
-    }
-
+public class StudentClass {
     @Id
     @Column(updatable = false, nullable = false)
     private Integer id;
 
-    @NotNull
+    @ManyToOne
+    @JoinColumn(name = "student_id", referencedColumnName = "id")
     private Student student;
 
-    @NotNull
+    @ManyToOne
+    @JoinColumn(name = "class_id", referencedColumnName = "id")
     private ClassEntity classEntity;
 
     @NotNull
-    private CompletionStatus status;
+    private String status;
 
     @PositiveOrZero
     @Max(100)
-    private double grade;
+    private Double grade;
 
-    protected StudentClasses() {}
+    protected StudentClass() {}
 
-    public StudentClasses(Integer id, Student student, ClassEntity classEntity, CompletionStatus status, double grade) {
+    public StudentClass(Integer id, Student student, ClassEntity classEntity, String status, Double grade) {
         this.id = id;
         this.student = student;
         this.classEntity = classEntity;
@@ -65,19 +61,19 @@ public class StudentClasses {
         this.classEntity = classEntity;
     }
 
-    public CompletionStatus getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(CompletionStatus status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 
-    public double getGrade() {
+    public Double getGrade() {
         return grade;
     }
 
-    public void setGrade(double grade) {
+    public void setGrade(Double grade) {
         this.grade = grade;
     }
 }
