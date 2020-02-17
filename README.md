@@ -1,10 +1,12 @@
-<image src="diagram.png>
-
-# REST API
+# College Registrar Services REST API
 
 This project is a REST API mirroring the operations performed by a college registrar office as described below.
 
-## Courses
+## DB Diagram
+<p align="center"><img src="/diagram.png" width="700px"></p>
+
+## REST API
+### Courses
 <details>
 <summary>GET List of Courses</summary>
 
@@ -62,7 +64,7 @@ This project is a REST API mirroring the operations performed by a college regis
     
 </details>
 
-## Instructors
+### Instructors
 <details>
 <summary>GET List of Instructors</summary>
 
@@ -116,7 +118,7 @@ This project is a REST API mirroring the operations performed by a college regis
 ```
 </details>
 
-## Majors
+### Majors
 <details>
 <summary>GET List of Majors</summary>
 
@@ -155,7 +157,7 @@ This project is a REST API mirroring the operations performed by a college regis
     
 </details>
 
-## Semesters
+### Semesters
 <details>
 <summary>GET List of Semesters</summary>
 
@@ -190,7 +192,7 @@ This project is a REST API mirroring the operations performed by a college regis
 </details>
 
 
-## Students
+### Students
 <details>
 <summary>GET List of Students</summary>
 
@@ -247,7 +249,7 @@ This project is a REST API mirroring the operations performed by a college regis
 ```
 </details>
 
-## Subjects
+### Subjects
 <details>
 <summary>GET List of Subjects</summary>
 
