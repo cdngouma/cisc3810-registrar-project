@@ -8,7 +8,7 @@ This project is a REST API mirroring the operations performed by a college regis
 ## REST API
 ### Courses
 <details>
-<summary>GET List of Courses</summary>
+<summary>Get List of Courses</summary>
 
 #### Request
 `GET /courses/`
@@ -30,7 +30,7 @@ This project is a REST API mirroring the operations performed by a college regis
 </details>
 
 <details>
-<summary>GET Specific Course</summary>
+<summary>Get Specific Course</summary>
 
 #### Request
 `GET /courses/:id`
@@ -66,7 +66,7 @@ This project is a REST API mirroring the operations performed by a college regis
 
 ### Instructors
 <details>
-<summary>GET List of Instructors</summary>
+<summary>Get List of Instructors</summary>
 
 #### Request
 `GET /instructors`
@@ -88,7 +88,7 @@ This project is a REST API mirroring the operations performed by a college regis
 </details>
 
 <details>
-<summary>GET Specific Instructor</summary>
+<summary>Get Specific Instructor</summary>
 
 #### Request
 `GET /instructors/:id`
@@ -120,7 +120,7 @@ This project is a REST API mirroring the operations performed by a college regis
 
 ### Majors
 <details>
-<summary>GET List of Majors</summary>
+<summary>Get List of Majors</summary>
 
 #### Request
 `GET /majors`
@@ -159,7 +159,7 @@ This project is a REST API mirroring the operations performed by a college regis
 
 ### Semesters
 <details>
-<summary>GET List of Semesters</summary>
+<summary>Get List of Semesters</summary>
 
 #### Request
 `GET /semesters?active=BOOLEAN`
@@ -194,7 +194,7 @@ This project is a REST API mirroring the operations performed by a college regis
 
 ### Students
 <details>
-<summary>GET List of Students</summary>
+<summary>Get List of Students</summary>
 
 #### Request
 `GET /students/`
@@ -216,8 +216,9 @@ This project is a REST API mirroring the operations performed by a college regis
 </details>
 
 <details>
-<summary>GET Specific Student</summary>
+<summary>Get Specific Student</summary>
 
+#### Request
 `GET /students/:id`
     
     curl -i -H 'Accept: application/json' http://localhost:8080/students/98579719267549188
@@ -249,9 +250,89 @@ This project is a REST API mirroring the operations performed by a college regis
 ```
 </details>
 
+<details>
+<summary>Get List of Enrolled Classes</summary>
+
+#### Request
+`GET /students/:studentId/classes/enrolled`
+    
+    curl -i -H 'Accept: application/json' http://localhost:8080/students/98579719267549188/classes/enrolled
+
+#### Response
+
+    HTTP/1.1 200 OK
+    Date: Sun, 16 Feb 2020 17:43:06 GMT
+    Status: 200 OK
+    Content-Type: application/json;charset=UTF-8
+    
+```Json
+[]
+```
+</details>
+
+<details>
+<summary>Enroll to Classes</summary>
+
+#### Request
+`POST /students/:studentId/classes/enrolled`
+    
+    curl -i -H 'Accept: application/json' http://localhost:8080/students/98579719267549188/classes/enrolled
+
+#### Response
+
+    HTTP/1.1 201 OK
+    Date: Sun, 16 Feb 2020 17:43:06 GMT
+    Status: 200 OK
+    Content-Type: application/json;charset=UTF-8
+
+```Json
+[]
+```
+</details>
+
+<details>
+<summary>Drop Classes</summary>
+
+#### Request
+`DELETE /students/:studentId/classes/drop?id=CLASS_ID`
+    
+    curl -i -H 'Accept: application/json' http://localhost:8080/students/98579719267549188/classes/drop?id=10000000
+
+#### Response
+
+    HTTP/1.1 200 OK
+    Date: Sun, 16 Feb 2020 17:43:06 GMT
+    Status: 200 OK
+    Content-Type: application/json;charset=UTF-8
+
+```Json
+[]
+```
+</details>
+
+<details>
+<summary>Get List of Completed Courses</summary>
+
+#### Request
+`GET /students/:studentId/classes/history`
+    
+    curl -i -H 'Accept: application/json' http://localhost:8080/students/98579719267549188/classes/history
+
+#### Response
+
+    HTTP/1.1 200 OK
+    Date: Sun, 16 Feb 2020 17:43:06 GMT
+    Status: 200 OK
+    Content-Type: application/json;charset=UTF-8
+
+```Json
+[]
+```
+</details>
+
 ### Subjects
 <details>
-<summary>GET List of Subjects</summary>
+<summary>Get List of Subjects</summary>
 
 #### Request
 `GET /subjects/`
